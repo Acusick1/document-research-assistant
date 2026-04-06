@@ -1,0 +1,309 @@
+# yaml-language-server: $schema=comparison_schema.json
+name: comparison
+cases:
+- name: aapl_vs_msft_net_income
+  inputs:
+    query: Which company had higher net income, Apple Inc. (FY2025) or MICROSOFT CORP
+      (FY2025)?
+  metadata:
+    category: comparison
+    company: AAPL
+    companies:
+    - AAPL
+    - MSFT
+    metric: net_income
+  expected_output:
+    answer: Apple Inc.
+    numeric_answer: null
+    sources: []
+  evaluators: []
+- name: aapl_vs_msft_operating_income
+  inputs:
+    query: Which company had higher operating income, Apple Inc. (FY2025) or MICROSOFT
+      CORP (FY2025)?
+  metadata:
+    category: comparison
+    company: AAPL
+    companies:
+    - AAPL
+    - MSFT
+    metric: operating_income
+  expected_output:
+    answer: Apple Inc.
+    numeric_answer: null
+    sources: []
+  evaluators: []
+- name: aapl_vs_msft_revenue
+  inputs:
+    query: Which company had higher total revenue, Apple Inc. (FY2025) or MICROSOFT
+      CORP (FY2025)?
+  metadata:
+    category: comparison
+    company: AAPL
+    companies:
+    - AAPL
+    - MSFT
+    metric: revenue
+  expected_output:
+    answer: Apple Inc.
+    numeric_answer: null
+    sources: []
+  evaluators: []
+- name: aapl_vs_msft_total_assets
+  inputs:
+    query: Which company had higher total assets, Apple Inc. (FY2025) or MICROSOFT
+      CORP (FY2025)?
+  metadata:
+    category: comparison
+    company: MSFT
+    companies:
+    - AAPL
+    - MSFT
+    metric: total_assets
+  expected_output:
+    answer: MICROSOFT CORP
+    numeric_answer: null
+    sources: []
+  evaluators: []
+- name: aapl_vs_msft_total_liabilities
+  inputs:
+    query: Which company had higher total liabilities, Apple Inc. (FY2025) or MICROSOFT
+      CORP (FY2025)?
+  metadata:
+    category: comparison
+    company: AAPL
+    companies:
+    - AAPL
+    - MSFT
+    metric: total_liabilities
+  expected_output:
+    answer: Apple Inc.
+    numeric_answer: null
+    sources: []
+  evaluators: []
+- name: aapl_vs_nvda_net_income
+  inputs:
+    query: Which company had higher net income, Apple Inc. (FY2025) or NVIDIA CORP
+      (FY2026)?
+  metadata:
+    category: comparison
+    company: NVDA
+    companies:
+    - AAPL
+    - NVDA
+    metric: net_income
+  expected_output:
+    answer: NVIDIA CORP
+    numeric_answer: null
+    sources: []
+  evaluators: []
+- name: aapl_vs_nvda_operating_income
+  inputs:
+    query: Which company had higher operating income, Apple Inc. (FY2025) or NVIDIA
+      CORP (FY2026)?
+  metadata:
+    category: comparison
+    company: AAPL
+    companies:
+    - AAPL
+    - NVDA
+    metric: operating_income
+  expected_output:
+    answer: Apple Inc.
+    numeric_answer: null
+    sources: []
+  evaluators: []
+- name: aapl_vs_nvda_revenue
+  inputs:
+    query: Which company had higher total revenue, Apple Inc. (FY2025) or NVIDIA CORP
+      (FY2026)?
+  metadata:
+    category: comparison
+    company: AAPL
+    companies:
+    - AAPL
+    - NVDA
+    metric: revenue
+  expected_output:
+    answer: Apple Inc.
+    numeric_answer: null
+    sources: []
+  evaluators: []
+- name: aapl_vs_nvda_total_assets
+  inputs:
+    query: Which company had higher total assets, Apple Inc. (FY2025) or NVIDIA CORP
+      (FY2026)?
+  metadata:
+    category: comparison
+    company: AAPL
+    companies:
+    - AAPL
+    - NVDA
+    metric: total_assets
+  expected_output:
+    answer: Apple Inc.
+    numeric_answer: null
+    sources: []
+  evaluators: []
+- name: aapl_vs_nvda_total_liabilities
+  inputs:
+    query: Which company had higher total liabilities, Apple Inc. (FY2025) or NVIDIA
+      CORP (FY2026)?
+  metadata:
+    category: comparison
+    company: AAPL
+    companies:
+    - AAPL
+    - NVDA
+    metric: total_liabilities
+  expected_output:
+    answer: Apple Inc.
+    numeric_answer: null
+    sources: []
+  evaluators: []
+- name: googl_vs_amzn_net_income
+  inputs:
+    query: Which company had higher net income, Alphabet Inc. (FY2025) or AMAZON COM
+      INC (FY2025)?
+  metadata:
+    category: comparison
+    company: GOOGL
+    companies:
+    - GOOGL
+    - AMZN
+    metric: net_income
+  expected_output:
+    answer: Alphabet Inc.
+    numeric_answer: null
+    sources: []
+  evaluators: []
+- name: googl_vs_amzn_operating_income
+  inputs:
+    query: Which company had higher operating income, Alphabet Inc. (FY2025) or AMAZON
+      COM INC (FY2025)?
+  metadata:
+    category: comparison
+    company: GOOGL
+    companies:
+    - GOOGL
+    - AMZN
+    metric: operating_income
+  expected_output:
+    answer: Alphabet Inc.
+    numeric_answer: null
+    sources: []
+  evaluators: []
+- name: googl_vs_amzn_revenue
+  inputs:
+    query: Which company had higher total revenue, Alphabet Inc. (FY2025) or AMAZON
+      COM INC (FY2025)?
+  metadata:
+    category: comparison
+    company: AMZN
+    companies:
+    - GOOGL
+    - AMZN
+    metric: revenue
+  expected_output:
+    answer: AMAZON COM INC
+    numeric_answer: null
+    sources: []
+  evaluators: []
+- name: googl_vs_amzn_total_assets
+  inputs:
+    query: Which company had higher total assets, Alphabet Inc. (FY2025) or AMAZON
+      COM INC (FY2025)?
+  metadata:
+    category: comparison
+    company: AMZN
+    companies:
+    - GOOGL
+    - AMZN
+    metric: total_assets
+  expected_output:
+    answer: AMAZON COM INC
+    numeric_answer: null
+    sources: []
+  evaluators: []
+- name: meta_vs_nvda_net_income
+  inputs:
+    query: Which company had higher net income, Meta Platforms, Inc. (FY2025) or NVIDIA
+      CORP (FY2026)?
+  metadata:
+    category: comparison
+    company: NVDA
+    companies:
+    - META
+    - NVDA
+    metric: net_income
+  expected_output:
+    answer: NVIDIA CORP
+    numeric_answer: null
+    sources: []
+  evaluators: []
+- name: meta_vs_nvda_operating_income
+  inputs:
+    query: Which company had higher operating income, Meta Platforms, Inc. (FY2025)
+      or NVIDIA CORP (FY2026)?
+  metadata:
+    category: comparison
+    company: NVDA
+    companies:
+    - META
+    - NVDA
+    metric: operating_income
+  expected_output:
+    answer: NVIDIA CORP
+    numeric_answer: null
+    sources: []
+  evaluators: []
+- name: meta_vs_nvda_revenue
+  inputs:
+    query: Which company had higher total revenue, Meta Platforms, Inc. (FY2025) or
+      NVIDIA CORP (FY2026)?
+  metadata:
+    category: comparison
+    company: NVDA
+    companies:
+    - META
+    - NVDA
+    metric: revenue
+  expected_output:
+    answer: NVIDIA CORP
+    numeric_answer: null
+    sources: []
+  evaluators: []
+- name: meta_vs_nvda_total_assets
+  inputs:
+    query: Which company had higher total assets, Meta Platforms, Inc. (FY2025) or
+      NVIDIA CORP (FY2026)?
+  metadata:
+    category: comparison
+    company: META
+    companies:
+    - META
+    - NVDA
+    metric: total_assets
+  expected_output:
+    answer: Meta Platforms, Inc.
+    numeric_answer: null
+    sources: []
+  evaluators: []
+- name: meta_vs_nvda_total_liabilities
+  inputs:
+    query: Which company had higher total liabilities, Meta Platforms, Inc. (FY2025)
+      or NVIDIA CORP (FY2026)?
+  metadata:
+    category: comparison
+    company: META
+    companies:
+    - META
+    - NVDA
+    metric: total_liabilities
+  expected_output:
+    answer: Meta Platforms, Inc.
+    numeric_answer: null
+    sources: []
+  evaluators: []
+evaluators: []
+report_evaluators: []
