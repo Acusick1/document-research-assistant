@@ -1,0 +1,53 @@
+from __future__ import annotations
+
+from functools import lru_cache
+from pathlib import Path
+from typing import Literal
+
+from pydantic import SecretStr
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+_DEFAULT_DATASETS_DIR = Path(__file__).parent / "eval" / "datasets"
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_prefix="RA_", env_file=".env")
+
+    llm_model: str = "anthropic:claude-sonnet-4-6"
+    anthropic_api_key: SecretStr | None = None
+
+    embedding_model: str = "BAAI/bge-small-en-v1.5"
+    embedding_dim: int = 384
+
+    qdrant_mode: Literal["memory", "local", "server", "cloud"] = "local"
+    qdrant_path: str = "./qdrant_data"
+    qdrant_url: str = "http://localhost:6333"
+    qdrant_api_key: SecretStr | None = None
+    collection_name: str = "documents"
+
+    chunk_max_tokens: int = 512
+
+    top_k: int = 5
+
+    datasets_dir: Path = _DEFAULT_DATASETS_DIR
+
+    logfire_token: SecretStr | None = None
+    log_level: str = "INFO"
+
+    eval_judge_model: str = "openai:gpt-4o-mini"
+    openai_api_key: SecretStr | None = None
+
+
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()
+
+
+def configure_logfire(settings: Settings | None = None) -> None:
+    settings = settings or get_settings()
+    if settings.logfire_token is None:
+        return
+    import logfire
+
+    logfire.configure(token=settings.logfire_token.get_secret_value())
+    logfire.instrument_pydantic_ai()
