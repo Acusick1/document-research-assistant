@@ -18,13 +18,11 @@ from research_assistant.config import Settings
 from research_assistant.corpus.models import Chunk
 
 
-class SearchResult(BaseModel):
+class ChunkPayload(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
-    id: str
-    score: float
-    text: str
     chunk_id: str
+    text: str
     document_id: str
     section_name: str
     chunk_index: int
@@ -32,6 +30,23 @@ class SearchResult(BaseModel):
     period: str
     filing_type: str
     source: str
+
+    @classmethod
+    def from_chunk(cls, chunk: Chunk) -> ChunkPayload:
+        metadata = chunk.metadata.model_dump(mode="json")
+        metadata.update(
+            chunk_id=chunk.id,
+            text=chunk.text,
+            document_id=chunk.document_id,
+            section_name=chunk.section_name,
+            chunk_index=chunk.chunk_index,
+        )
+        return cls(**metadata)
+
+
+class SearchResult(ChunkPayload):
+    id: str
+    score: float
 
 
 def _str_to_uuid(s: str) -> str:
@@ -73,14 +88,7 @@ class QdrantStore:
             PointStruct(
                 id=_str_to_uuid(chunk.id),
                 vector=vector,
-                payload={
-                    "chunk_id": chunk.id,
-                    "text": chunk.text,
-                    "document_id": chunk.document_id,
-                    "section_name": chunk.section_name,
-                    "chunk_index": chunk.chunk_index,
-                    **chunk.metadata.model_dump(mode="json"),
-                },
+                payload=ChunkPayload.from_chunk(chunk).model_dump(mode="json"),
             )
             for chunk, vector in zip(chunks, vectors, strict=True)
         ]
