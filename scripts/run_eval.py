@@ -6,7 +6,7 @@ import logging
 from collections import defaultdict
 
 from research_assistant.config import configure_logfire, get_settings
-from research_assistant.eval.models import EvalMetadata
+from research_assistant.eval.models import EvalInput, EvalMetadata, EvalOutput
 from research_assistant.eval.runner import run_all_evals
 from research_assistant.pipeline import RagPipeline
 
@@ -25,6 +25,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--name", help="Experiment name for Logfire tracking",
     )
+    parser.add_argument(
+        "--concurrency", type=int, default=2,
+        help="Max concurrent eval cases (default: 2)",
+    )
+    parser.add_argument(
+        "--delay", type=float, default=1.0,
+        help="Seconds to wait between eval cases (default: 1.0)",
+    )
     return parser.parse_args()
 
 
@@ -34,12 +42,19 @@ async def main() -> None:
     configure_logfire(settings)
     logging.basicConfig(level=settings.log_level)
 
-    task = RagPipeline(settings).__call__
-    logger.info("Running eval suite")
+    pipeline = RagPipeline(settings)
+
+    async def throttled_task(eval_input: EvalInput) -> EvalOutput:
+        result = await pipeline(eval_input)
+        if args.delay > 0:
+            await asyncio.sleep(args.delay)
+        return result
+
+    logger.info("Running eval suite (concurrency=%d, delay=%.1fs)", args.concurrency, args.delay)
 
     results = await run_all_evals(
-        task=task, dataset_name=args.dataset, max_cases=args.max_cases,
-        experiment_name=args.name,
+        task=throttled_task, dataset_name=args.dataset, max_cases=args.max_cases,
+        experiment_name=args.name, max_concurrency=args.concurrency,
     )
 
     for name, report in results.items():
