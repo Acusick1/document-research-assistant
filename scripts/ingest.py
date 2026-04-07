@@ -4,6 +4,7 @@ import argparse
 import logging
 
 from research_assistant.config import Settings, configure_logfire
+from research_assistant.corpus.edgar.cache import create_cache
 from research_assistant.corpus.edgar.chunker import EdgarChunker
 from research_assistant.corpus.edgar.parser import EdgarParser
 from research_assistant.retrieval.embeddings import FastEmbedEmbedder
@@ -20,13 +21,17 @@ def main() -> None:
         "--years", nargs="+", type=int, default=[2022, 2023, 2024], help="Fiscal years"
     )
     parser.add_argument("--identity", default="ResearchAssistant research@example.com")
+    parser.add_argument(
+        "--no-cache", action="store_true", help="Bypass the disk cache for EDGAR API responses"
+    )
     args = parser.parse_args()
 
     settings = Settings()
     configure_logfire(settings)
     logging.basicConfig(level=settings.log_level)
 
-    edgar_parser = EdgarParser(identity=args.identity)
+    cache = None if args.no_cache else create_cache(settings.cache_dir)
+    edgar_parser = EdgarParser(identity=args.identity, cache=cache)
     chunker = EdgarChunker(max_tokens=settings.chunk_max_tokens)
     embedder = FastEmbedEmbedder(model_name=settings.embedding_model)
     client = create_qdrant_client(settings)

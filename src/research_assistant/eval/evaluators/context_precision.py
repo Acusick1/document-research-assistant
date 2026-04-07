@@ -30,9 +30,7 @@ class ContextPrecision(Evaluator[EvalInput, EvalOutput, EvalMetadata]):
             return EvaluationReason(value=0.0, reason="No target company in metadata")
 
         targets_upper = {c.upper() for c in target_companies}
-        relevant = sum(
-            1 for s in sources if any(t in s.upper() for t in targets_upper)
-        )
+        relevant = sum(1 for s in sources if any(t in s.upper() for t in targets_upper))
         precision = relevant / len(sources)
         label = ", ".join(target_companies)
 

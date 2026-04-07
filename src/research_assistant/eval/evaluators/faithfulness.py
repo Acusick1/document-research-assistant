@@ -25,10 +25,7 @@ class Faithfulness(Evaluator[EvalInput, EvalOutput, EvalMetadata]):
             return EvaluationReason(value=0.0, reason="No sources retrieved")
 
         sources_text = "\n---\n".join(sources)
-        output_for_judge = (
-            f"<Answer>{answer}</Answer>\n"
-            f"<Sources>\n{sources_text}\n</Sources>"
-        )
+        output_for_judge = f"<Answer>{answer}</Answer>\n<Sources>\n{sources_text}\n</Sources>"
         rubric = (
             "Evaluate faithfulness: what fraction of factual claims in the Answer "
             "are directly supported by the Sources? Ignore stylistic differences. "

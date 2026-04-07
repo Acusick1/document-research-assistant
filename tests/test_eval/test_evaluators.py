@@ -108,9 +108,7 @@ class TestContextPrecision:
         evaluator = ContextPrecision()
         ctx = _make_context(
             output=EvalOutput(sources=["AAPL_chunk1", "MSFT_chunk2"]),
-            metadata=EvalMetadata(
-                category="comparison", companies=["AAPL", "MSFT"]
-            ),
+            metadata=EvalMetadata(category="comparison", companies=["AAPL", "MSFT"]),
         )
         result = evaluator.evaluate(ctx)
         assert result.value == 1.0
@@ -119,9 +117,7 @@ class TestContextPrecision:
         evaluator = ContextPrecision()
         ctx = _make_context(
             output=EvalOutput(sources=["AAPL_chunk1", "NVDA_chunk2"]),
-            metadata=EvalMetadata(
-                category="comparison", companies=["AAPL", "MSFT"]
-            ),
+            metadata=EvalMetadata(category="comparison", companies=["AAPL", "MSFT"]),
         )
         result = evaluator.evaluate(ctx)
         assert result.value == 0.5

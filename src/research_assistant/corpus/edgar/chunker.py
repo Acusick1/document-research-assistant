@@ -55,9 +55,7 @@ class EdgarChunker:
                     f"{document.id}:{section_name}:{chunk_index}".encode()
                 ).hexdigest()[:16]
 
-                chunk_metadata = base_metadata.model_copy(
-                    update={"section_name": section_name}
-                )
+                chunk_metadata = base_metadata.model_copy(update={"section_name": section_name})
 
                 chunks.append(
                     Chunk(

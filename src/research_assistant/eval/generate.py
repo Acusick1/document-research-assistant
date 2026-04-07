@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 import pandas as pd
 from edgar import Company, set_identity
 from pydantic_evals import Case
 
+from research_assistant.corpus.edgar.cache import EdgarCache, FactsCacheEntry, facts_key
 from research_assistant.eval.evaluators.numeric_match import NumericMatch
 from research_assistant.eval.models import EvalInput, EvalMetadata, EvalOutput
 
@@ -49,6 +51,29 @@ XBRL_TAG_MAP: dict[str, list[str]] = {
 MIN_ANNUAL_DAYS = 300
 
 
+def _get_company_facts(ticker: str, cache: EdgarCache | None) -> tuple[str, pd.DataFrame] | None:
+    key = facts_key(ticker)
+    if cache is not None:
+        cached: FactsCacheEntry | None = cache.get(key)
+        if cached is not None:
+            logger.info("Cache hit for %s XBRL facts", ticker)
+            return cached["name"], pd.DataFrame(cached["facts_columns"])
+
+    company = Company(ticker)
+    name = company.name or ticker.upper()
+    facts = company.get_facts()
+    if facts is None:
+        return None
+    facts_df: pd.DataFrame = facts.to_dataframe()
+
+    if cache is not None:
+        columns: dict[str, list[Any]] = facts_df.to_dict("list")  # type: ignore[assignment]
+        entry = FactsCacheEntry(name=name, facts_columns=columns)
+        cache.set(key, entry)
+
+    return name, facts_df
+
+
 def _get_annual_values(
     facts_df: pd.DataFrame,
     concept: str,
@@ -58,9 +83,7 @@ def _get_annual_values(
     if not tags:
         return {}
 
-    usd_rows = facts_df[
-        (facts_df["unit"] == "USD") & (facts_df["concept"].isin(tags))
-    ].copy()
+    usd_rows = facts_df[(facts_df["unit"] == "USD") & (facts_df["concept"].isin(tags))].copy()
 
     if usd_rows.empty:
         return {}
@@ -101,18 +124,17 @@ def generate_factual_cases(
     tickers: list[str],
     identity: str = "ResearchAssistant research@example.com",
     min_year: int = 2022,
+    cache: EdgarCache | None = None,
 ) -> list[Case[EvalInput, EvalOutput, EvalMetadata]]:
     set_identity(identity)
     cases: list[Case[EvalInput, EvalOutput, EvalMetadata]] = []
 
     for ticker in tickers:
-        company = Company(ticker)
-        facts = company.get_facts()
-        if facts is None:
+        result = _get_company_facts(ticker, cache)
+        if result is None:
             logger.warning("No XBRL facts for %s, skipping", ticker)
             continue
-        name = company.name
-        facts_df = facts.to_dataframe()
+        name, facts_df = result
 
         for concept, label in FACTUAL_CONCEPTS:
             annual = _get_annual_values(facts_df, concept, min_year=min_year)
@@ -167,9 +189,7 @@ def _log_coverage(
     for ticker in tickers:
         ticker_upper = ticker.upper()
         metrics = by_ticker.get(ticker_upper, set())
-        missing = [
-            concept for concept, _ in FACTUAL_CONCEPTS if concept not in metrics
-        ]
+        missing = [concept for concept, _ in FACTUAL_CONCEPTS if concept not in metrics]
         if missing:
             logger.warning(
                 "%s: missing %d metrics: %s",
@@ -184,19 +204,18 @@ def _log_coverage(
 def generate_comparison_cases(
     tickers: list[str],
     identity: str = "ResearchAssistant research@example.com",
+    cache: EdgarCache | None = None,
 ) -> list[Case[EvalInput, EvalOutput, EvalMetadata]]:
     set_identity(identity)
 
     # Collect the latest annual value per company per concept
     company_values: dict[str, dict[str, tuple[float, str, str]]] = {}
     for ticker in tickers:
-        company = Company(ticker)
-        facts = company.get_facts()
-        if facts is None:
+        result = _get_company_facts(ticker, cache)
+        if result is None:
             logger.warning("No XBRL facts for %s, skipping", ticker)
             continue
-        name = company.name
-        facts_df = facts.to_dataframe()
+        name, facts_df = result
 
         values: dict[str, tuple[float, str, str]] = {}
         for concept, _ in FACTUAL_CONCEPTS:
@@ -228,8 +247,7 @@ def generate_comparison_cases(
                     name=f"{t1.lower()}_vs_{t2.lower()}_{concept}",
                     inputs=EvalInput(
                         query=(
-                            f"Which company had higher {label}, "
-                            f"{name1} ({fy1}) or {name2} ({fy2})?"
+                            f"Which company had higher {label}, {name1} ({fy1}) or {name2} ({fy2})?"
                         ),
                     ),
                     expected_output=EvalOutput(answer=higher),
