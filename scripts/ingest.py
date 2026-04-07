@@ -18,7 +18,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Ingest EDGAR filings into Qdrant")
     parser.add_argument("--tickers", nargs="+", required=True, help="Ticker symbols")
     parser.add_argument(
-        "--years", nargs="+", type=int, default=[2022, 2023, 2024], help="Fiscal years"
+        "--years", nargs="+", type=int, default=[2022, 2023, 2024, 2025], help="Fiscal years"
     )
     parser.add_argument("--identity", default="ResearchAssistant research@example.com")
     parser.add_argument(

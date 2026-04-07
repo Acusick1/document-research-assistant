@@ -205,6 +205,7 @@ def generate_comparison_cases(
     tickers: list[str],
     identity: str = "ResearchAssistant research@example.com",
     cache: EdgarCache | None = None,
+    max_pairs_per_concept: int = 3,
 ) -> list[Case[EvalInput, EvalOutput, EvalMetadata]]:
     set_identity(identity)
 
@@ -228,36 +229,43 @@ def generate_comparison_cases(
     cases: list[Case[EvalInput, EvalOutput, EvalMetadata]] = []
     ticker_list = list(company_values.keys())
 
-    for i in range(len(ticker_list)):
-        for j in range(i + 1, len(ticker_list)):
-            t1, t2 = ticker_list[i], ticker_list[j]
+    all_pairs = [
+        (ticker_list[i], ticker_list[j])
+        for i in range(len(ticker_list))
+        for j in range(i + 1, len(ticker_list))
+    ]
+
+    for concept, label in FACTUAL_CONCEPTS:
+        pairs_used = 0
+        for t1, t2 in all_pairs:
+            if pairs_used >= max_pairs_per_concept:
+                break
             v1, v2 = company_values[t1], company_values[t2]
+            if concept not in v1 or concept not in v2:
+                continue
 
-            for concept, label in FACTUAL_CONCEPTS[:5]:
-                if concept not in v1 or concept not in v2:
-                    continue
+            val1, name1, fy1 = v1[concept]
+            val2, name2, fy2 = v2[concept]
 
-                val1, name1, fy1 = v1[concept]
-                val2, name2, fy2 = v2[concept]
+            higher = name1 if val1 > val2 else name2
+            higher_ticker = t1 if val1 > val2 else t2
 
-                higher = name1 if val1 > val2 else name2
-                higher_ticker = t1 if val1 > val2 else t2
-
-                case = Case(
-                    name=f"{t1.lower()}_vs_{t2.lower()}_{concept}",
-                    inputs=EvalInput(
-                        query=(
-                            f"Which company had higher {label}, {name1} ({fy1}) or {name2} ({fy2})?"
-                        ),
+            case = Case(
+                name=f"{t1.lower()}_vs_{t2.lower()}_{concept}",
+                inputs=EvalInput(
+                    query=(
+                        f"Which company had higher {label}, {name1} ({fy1}) or {name2} ({fy2})?"
                     ),
-                    expected_output=EvalOutput(answer=higher),
-                    metadata=EvalMetadata(
-                        category="comparison",
-                        companies=[t1, t2],
-                        company=higher_ticker,
-                        metric=concept,
-                    ),
-                )
-                cases.append(case)
+                ),
+                expected_output=EvalOutput(answer=higher),
+                metadata=EvalMetadata(
+                    category="comparison",
+                    companies=[t1, t2],
+                    company=higher_ticker,
+                    metric=concept,
+                ),
+            )
+            cases.append(case)
+            pairs_used += 1
 
     return cases

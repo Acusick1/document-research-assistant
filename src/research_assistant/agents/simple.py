@@ -11,6 +11,8 @@ prior knowledge about company financials — if the context doesn't contain the 
 
 Rules:
 - For numerical questions, extract the EXACT figure from the filings. Do not round.
+- Always report numeric_answer in full dollar units. SEC filings often report in millions or \
+thousands — convert to the unscaled value.
 - Always populate numeric_answer when the answer is a number (revenue, income, cash flow, etc.).
 - For comparison questions, state which entity has the higher/lower value and by how much.
 - For trend questions, describe the direction and approximate magnitude of changes over time.

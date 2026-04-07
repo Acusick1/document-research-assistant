@@ -7,7 +7,8 @@ from collections import defaultdict
 
 from research_assistant.config import Settings, configure_logfire
 from research_assistant.eval.models import EvalMetadata
-from research_assistant.eval.runner import TaskFn, run_all_evals
+from research_assistant.eval.runner import run_all_evals
+from research_assistant.pipeline import RagPipeline
 
 logger = logging.getLogger(__name__)
 
@@ -15,9 +16,14 @@ logger = logging.getLogger(__name__)
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run eval suite")
     parser.add_argument(
-        "--rag",
-        action="store_true",
-        help="Run against the RAG pipeline instead of the stub task",
+        "--dataset",
+        help="Run only the named dataset (e.g. 'factual', 'comparison')",
+    )
+    parser.add_argument(
+        "--max-cases", type=int, help="Limit the number of cases per dataset",
+    )
+    parser.add_argument(
+        "--name", help="Experiment name for Logfire tracking",
     )
     return parser.parse_args()
 
@@ -28,16 +34,13 @@ async def main() -> None:
     configure_logfire(settings)
     logging.basicConfig(level=settings.log_level)
 
-    task: TaskFn | None = None
-    if args.rag:
-        from research_assistant.pipeline import RagPipeline
+    task = RagPipeline(settings).__call__
+    logger.info("Running eval suite")
 
-        task = RagPipeline(settings)
-        logger.info("Running eval suite with RAG pipeline")
-    else:
-        logger.info("Running eval suite with stub task (baseline)")
-
-    results = await run_all_evals(task=task)
+    results = await run_all_evals(
+        task=task, dataset_name=args.dataset, max_cases=args.max_cases,
+        experiment_name=args.name,
+    )
 
     for name, report in results.items():
         print(f"\n{'=' * 60}")

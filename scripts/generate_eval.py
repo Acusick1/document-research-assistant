@@ -25,6 +25,10 @@ def main() -> None:
     parser.add_argument(
         "--no-cache", action="store_true", help="Bypass the disk cache for EDGAR API responses"
     )
+    parser.add_argument(
+        "--max-comparison-pairs", type=int, default=3,
+        help="Max ticker pairs per concept in comparison cases",
+    )
     args = parser.parse_args()
 
     logging.basicConfig(level="INFO")
@@ -44,7 +48,10 @@ def main() -> None:
     logger.info("Wrote %s", factual_path)
 
     logger.info("Generating comparison cases for %s", args.tickers)
-    comparison_cases = generate_comparison_cases(args.tickers, identity=args.identity, cache=cache)
+    comparison_cases = generate_comparison_cases(
+        args.tickers, identity=args.identity, cache=cache,
+        max_pairs_per_concept=args.max_comparison_pairs,
+    )
     logger.info("Generated %d comparison cases", len(comparison_cases))
 
     comparison_ds = Dataset[EvalInput, EvalOutput, EvalMetadata](
