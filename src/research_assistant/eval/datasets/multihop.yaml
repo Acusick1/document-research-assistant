@@ -1,0 +1,69 @@
+name: multihop
+evaluators:
+- LLMJudge:
+    rubric: >-
+      The output should address all parts of the multi-hop question. It must
+      correctly identify the companies asked about, provide accurate comparative
+      analysis, and reach conclusions consistent with the expected output. The
+      answer should demonstrate synthesis across multiple documents or data points.
+      Minor differences in framing are acceptable if the core facts align.
+    include_input: true
+    include_expected_output: true
+- ContextPrecision: {}
+report_evaluators: []
+cases:
+- name: highest_revenue_growth_and_risks
+  inputs:
+    query: Among Apple, Microsoft, and NVIDIA, which had the largest year-over-year revenue growth in their most recent fiscal year, and what were their top risk factors?
+  metadata:
+    category: multihop
+    companies:
+    - AAPL
+    - MSFT
+    - NVDA
+  expected_output:
+    answer: "NVIDIA had the largest YoY revenue growth. Key risk factors include supply chain concentration, customer concentration, and geopolitical risks related to chip exports."
+- name: margin_comparison_with_explanation
+  inputs:
+    query: Compare the gross margins of Apple, Microsoft, and Alphabet in their most recent fiscal year. Which company has the highest, and what business factors explain the differences?
+  metadata:
+    category: multihop
+    companies:
+    - AAPL
+    - MSFT
+    - GOOGL
+  expected_output:
+    answer: "Microsoft typically has the highest gross margin driven by software/cloud mix. Apple's hardware-heavy mix produces lower margins. Alphabet falls between, with high-margin ad revenue offset by cloud and hardware investments."
+- name: rd_intensity_and_strategy
+  inputs:
+    query: Which of the big tech companies (Apple, Microsoft, Alphabet, Amazon, Meta) spends the most on R&D as a percentage of revenue, and how does each company describe its R&D strategy in their 10-K?
+  metadata:
+    category: multihop
+    companies:
+    - AAPL
+    - MSFT
+    - GOOGL
+    - AMZN
+    - META
+  expected_output:
+    answer: "Meta typically has the highest R&D-to-revenue ratio, driven by Reality Labs investments. Each company describes different strategic priorities in their 10-K filings."
+- name: cash_position_and_capital_allocation
+  inputs:
+    query: Compare the cash positions and capital allocation strategies of Apple and Microsoft based on their most recent 10-K filings. How do their approaches to dividends, buybacks, and capex differ?
+  metadata:
+    category: multihop
+    companies:
+    - AAPL
+    - MSFT
+  expected_output:
+    answer: "Both Apple and Microsoft return significant capital to shareholders. Apple is known for large share buyback programs while also paying dividends. Microsoft pays growing dividends and also does buybacks. Their capex strategies differ with Microsoft investing heavily in cloud infrastructure."
+- name: debt_leverage_comparison
+  inputs:
+    query: How do Amazon and Apple's debt-to-equity ratios compare, and what does each company's 10-K say about their debt management strategy?
+  metadata:
+    category: multihop
+    companies:
+    - AMZN
+    - AAPL
+  expected_output:
+    answer: "Apple carries substantial debt partly to fund share buybacks in a tax-efficient manner. Amazon's debt profile reflects infrastructure and acquisition financing. Both maintain investment-grade ratings."

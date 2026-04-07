@@ -20,14 +20,23 @@ class ContextPrecision(Evaluator[EvalInput, EvalOutput, EvalMetadata]):
         if metadata is None:
             return EvaluationReason(value=0.0, reason="No metadata to check relevance")
 
-        target_company = metadata.company
-        if not target_company:
+        target_companies: list[str] = []
+        if metadata.companies:
+            target_companies = metadata.companies
+        elif metadata.company:
+            target_companies = [metadata.company]
+
+        if not target_companies:
             return EvaluationReason(value=0.0, reason="No target company in metadata")
 
-        relevant = sum(1 for s in sources if target_company.upper() in s.upper())
+        targets_upper = {c.upper() for c in target_companies}
+        relevant = sum(
+            1 for s in sources if any(t in s.upper() for t in targets_upper)
+        )
         precision = relevant / len(sources)
+        label = ", ".join(target_companies)
 
         return EvaluationReason(
             value=precision,
-            reason=f"{relevant}/{len(sources)} sources relevant to {target_company}",
+            reason=f"{relevant}/{len(sources)} sources relevant to {label}",
         )

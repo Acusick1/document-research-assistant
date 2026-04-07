@@ -1,0 +1,67 @@
+name: temporal
+evaluators:
+- LLMJudge:
+    rubric: >-
+      The output should accurately describe the financial trend indicated by the
+      expected output. It must get the direction of the trend correct (increasing,
+      decreasing, recovery, etc.) and reference approximate magnitudes where the
+      expected output provides them. Minor numerical differences are acceptable.
+    include_input: true
+    include_expected_output: true
+- ContextPrecision: {}
+report_evaluators: []
+cases:
+- name: apple_revenue_trend_3y
+  inputs:
+    query: How did Apple's total revenue change from FY2022 to FY2024?
+  metadata:
+    category: temporal
+    company: AAPL
+    metric: revenue
+  expected_output:
+    answer: "Apple's revenue decreased from ~$394B in FY2022 to ~$383B in FY2023, then recovered to ~$391B in FY2024"
+- name: msft_rd_trend
+  inputs:
+    query: What was the trend in Microsoft's R&D spending from FY2022 to FY2024?
+  metadata:
+    category: temporal
+    company: MSFT
+    metric: research_and_development
+  expected_output:
+    answer: "Microsoft's R&D spending increased consistently year over year from FY2022 to FY2024"
+- name: nvda_revenue_growth
+  inputs:
+    query: How did NVIDIA's revenue grow from FY2023 to FY2025?
+  metadata:
+    category: temporal
+    company: NVDA
+    metric: revenue
+  expected_output:
+    answer: "NVIDIA's revenue grew dramatically, roughly tripling from ~$27B in FY2023 to ~$130B in FY2025, driven by AI/datacenter demand"
+- name: meta_net_income_trend
+  inputs:
+    query: Describe Meta's net income trajectory from FY2022 to FY2024.
+  metadata:
+    category: temporal
+    company: META
+    metric: net_income
+  expected_output:
+    answer: "Meta's net income dropped significantly in FY2022 due to Reality Labs losses, then rebounded strongly in FY2023 and FY2024"
+- name: amzn_operating_income_trend
+  inputs:
+    query: How did Amazon's operating income change from FY2022 to FY2024?
+  metadata:
+    category: temporal
+    company: AMZN
+    metric: operating_income
+  expected_output:
+    answer: "Amazon's operating income improved significantly from FY2022 to FY2024, recovering from compressed margins in 2022"
+- name: googl_cash_flow_trend
+  inputs:
+    query: What was the trend in Alphabet's operating cash flow from FY2022 to FY2024?
+  metadata:
+    category: temporal
+    company: GOOGL
+    metric: operating_cash_flow
+  expected_output:
+    answer: "Alphabet's operating cash flow grew steadily from FY2022 to FY2024"

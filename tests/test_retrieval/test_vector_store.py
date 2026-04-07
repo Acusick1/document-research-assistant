@@ -80,7 +80,7 @@ class TestQdrantStore:
 
         results = store.search([1.0, 0.0, 0.0, 0.0], top_k=1)
         assert len(results) == 1
-        assert results[0]["text"] == "Apple makes iPhones"
+        assert results[0].text == "Apple makes iPhones"
 
     def test_search_with_filter(
         self,
@@ -96,4 +96,4 @@ class TestQdrantStore:
             filters={"section_name": "Item 7"},
         )
         assert len(results) == 1
-        assert results[0]["section_name"] == "Item 7"
+        assert results[0].section_name == "Item 7"

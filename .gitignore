@@ -12,3 +12,6 @@ qdrant_data/
 .ruff_cache/
 .pytest_cache/
 .mypy_cache/
+project-plan.md
+docs/phases/
+src/research_assistant/eval/datasets/*_schema.json
