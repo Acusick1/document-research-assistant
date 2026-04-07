@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections.abc import Hashable
 from pathlib import Path
 from typing import Any, Protocol, TypedDict, runtime_checkable
 
@@ -14,13 +13,13 @@ class FilingCacheEntry(TypedDict):
 
 class FactsCacheEntry(TypedDict):
     name: str
-    facts_columns: dict[Hashable, Any]
+    facts_columns: dict[str, list[Any]]
 
 
 @runtime_checkable
 class EdgarCache(Protocol):
     def get(self, key: str, default: Any = ...) -> Any: ...
-    def set(self, key: str, value: Any) -> None: ...
+    def set(self, key: str, value: Any) -> Any: ...
 
 
 def create_cache(cache_dir: Path) -> EdgarCache:

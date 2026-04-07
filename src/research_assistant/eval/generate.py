@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 import pandas as pd
 from edgar import Company, set_identity
@@ -66,7 +67,8 @@ def _get_company_facts(ticker: str, cache: EdgarCache | None) -> tuple[str, pd.D
     facts_df: pd.DataFrame = facts.to_dataframe()
 
     if cache is not None:
-        entry = FactsCacheEntry(name=name, facts_columns=facts_df.to_dict("list"))
+        columns: dict[str, list[Any]] = facts_df.to_dict("list")  # type: ignore[assignment]
+        entry = FactsCacheEntry(name=name, facts_columns=columns)
         cache.set(key, entry)
 
     return name, facts_df
