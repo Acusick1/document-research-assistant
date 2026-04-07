@@ -1,11 +1,20 @@
 from __future__ import annotations
 
 import logging
+import os
 import pickle
+import tempfile
 from pathlib import Path
-from typing import Any
+from typing import Any, TypedDict
+
+import pandas as pd
 
 logger = logging.getLogger(__name__)
+
+
+class FactsCacheEntry(TypedDict):
+    name: str
+    facts_df: pd.DataFrame
 
 
 class EdgarCache:
@@ -21,11 +30,11 @@ class EdgarCache:
         path = self._filing_path(ticker, year)
         self._save(path, data)
 
-    def get_facts(self, ticker: str) -> Any | None:
+    def get_facts(self, ticker: str) -> FactsCacheEntry | None:
         path = self._facts_path(ticker)
         return self._load(path)
 
-    def put_facts(self, ticker: str, data: Any) -> None:
+    def put_facts(self, ticker: str, data: FactsCacheEntry) -> None:
         path = self._facts_path(ticker)
         self._save(path, data)
 
@@ -47,6 +56,12 @@ class EdgarCache:
 
     def _save(self, path: Path, data: Any) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
-        with path.open("wb") as f:
-            pickle.dump(data, f)
+        fd, tmp = tempfile.mkstemp(dir=path.parent, suffix=".tmp")
+        try:
+            with os.fdopen(fd, "wb") as f:
+                pickle.dump(data, f)
+            os.replace(tmp, path)
+        except BaseException:
+            os.unlink(tmp)
+            raise
         logger.debug("Cached %s", path)

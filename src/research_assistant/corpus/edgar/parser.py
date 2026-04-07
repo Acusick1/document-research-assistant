@@ -14,6 +14,8 @@ from research_assistant.corpus.models import Document
 
 logger = logging.getLogger(__name__)
 
+# Standard 10-K sections mandated by the SEC (Items 1-16).
+# This subset covers business overview, risks, MD&A, and financials.
 TARGET_ITEMS = ["Item 1", "Item 1A", "Item 7", "Item 7A", "Item 8"]
 
 

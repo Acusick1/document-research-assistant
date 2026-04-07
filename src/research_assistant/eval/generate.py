@@ -6,7 +6,7 @@ import pandas as pd
 from edgar import Company, set_identity
 from pydantic_evals import Case
 
-from research_assistant.corpus.edgar.cache import EdgarCache
+from research_assistant.corpus.edgar.cache import EdgarCache, FactsCacheEntry
 from research_assistant.eval.evaluators.numeric_match import NumericMatch
 from research_assistant.eval.models import EvalInput, EvalMetadata, EvalOutput
 
@@ -50,23 +50,25 @@ XBRL_TAG_MAP: dict[str, list[str]] = {
 MIN_ANNUAL_DAYS = 300
 
 
-def _get_facts_df(ticker: str, cache: EdgarCache | None) -> pd.DataFrame | None:
+def _get_company_facts(ticker: str, cache: EdgarCache | None) -> tuple[str, pd.DataFrame] | None:
     if cache is not None:
         cached = cache.get_facts(ticker)
         if cached is not None:
             logger.info("Cache hit for %s XBRL facts", ticker)
-            return cached
+            return cached["name"], cached["facts_df"]
 
     company = Company(ticker)
+    name: str = company.name
     facts = company.get_facts()
     if facts is None:
         return None
     facts_df: pd.DataFrame = facts.to_dataframe()
 
     if cache is not None:
-        cache.put_facts(ticker, facts_df)
+        entry: FactsCacheEntry = {"name": name, "facts_df": facts_df}
+        cache.put_facts(ticker, entry)
 
-    return facts_df
+    return name, facts_df
 
 
 def _get_annual_values(
@@ -125,12 +127,11 @@ def generate_factual_cases(
     cases: list[Case[EvalInput, EvalOutput, EvalMetadata]] = []
 
     for ticker in tickers:
-        company = Company(ticker)
-        name = company.name
-        facts_df = _get_facts_df(ticker, cache)
-        if facts_df is None:
+        result = _get_company_facts(ticker, cache)
+        if result is None:
             logger.warning("No XBRL facts for %s, skipping", ticker)
             continue
+        name, facts_df = result
 
         for concept, label in FACTUAL_CONCEPTS:
             annual = _get_annual_values(facts_df, concept, min_year=min_year)
@@ -206,12 +207,11 @@ def generate_comparison_cases(
 
     company_values: dict[str, dict[str, tuple[float, str, str]]] = {}
     for ticker in tickers:
-        company = Company(ticker)
-        name = company.name
-        facts_df = _get_facts_df(ticker, cache)
-        if facts_df is None:
+        result = _get_company_facts(ticker, cache)
+        if result is None:
             logger.warning("No XBRL facts for %s, skipping", ticker)
             continue
+        name, facts_df = result
 
         values: dict[str, tuple[float, str, str]] = {}
         for concept, _ in FACTUAL_CONCEPTS:
