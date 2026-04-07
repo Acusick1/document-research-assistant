@@ -3,6 +3,7 @@ from __future__ import annotations
 import uuid
 from typing import Any
 
+from pydantic import BaseModel
 from qdrant_client import QdrantClient
 from qdrant_client.models import (
     Distance,
@@ -15,6 +16,20 @@ from qdrant_client.models import (
 
 from research_assistant.config import Settings
 from research_assistant.corpus.models import Chunk
+
+
+class SearchResult(BaseModel):
+    id: str
+    score: float
+    text: str
+    chunk_id: str
+    document_id: str
+    section_name: str
+    chunk_index: int
+    ticker: str = ""
+    period: str = ""
+    filing_type: str = ""
+    source: str = ""
 
 
 def _str_to_uuid(s: str) -> str:
@@ -74,7 +89,7 @@ class QdrantStore:
         vector: list[float],
         top_k: int = 5,
         filters: dict[str, Any] | None = None,
-    ) -> list[dict[str, Any]]:
+    ) -> list[SearchResult]:
         qdrant_filter = None
         if filters:
             qdrant_filter = Filter(
@@ -92,7 +107,7 @@ class QdrantStore:
         )
 
         return [
-            {"id": point.id, "score": point.score, **point.payload}
+            SearchResult(id=str(point.id), score=point.score, **point.payload)
             for point in results.points
             if point.payload
         ]

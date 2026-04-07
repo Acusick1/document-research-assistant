@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import asyncio
 import logging
 from collections import defaultdict
@@ -11,13 +12,32 @@ from research_assistant.eval.runner import run_all_evals
 logger = logging.getLogger(__name__)
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Run eval suite")
+    parser.add_argument(
+        "--rag",
+        action="store_true",
+        help="Run against the RAG pipeline instead of the stub task",
+    )
+    return parser.parse_args()
+
+
 async def main() -> None:
+    args = parse_args()
     settings = Settings()
     configure_logfire(settings)
     logging.basicConfig(level=settings.log_level)
 
-    logger.info("Running eval suite with stub task (baseline)")
-    results = await run_all_evals()
+    if args.rag:
+        from research_assistant.pipeline import RagPipeline
+
+        task = RagPipeline(settings)
+        logger.info("Running eval suite with RAG pipeline")
+    else:
+        task = None
+        logger.info("Running eval suite with stub task (baseline)")
+
+    results = await run_all_evals(task=task)
 
     for name, report in results.items():
         print(f"\n{'=' * 60}")
