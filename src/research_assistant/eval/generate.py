@@ -205,6 +205,7 @@ def generate_comparison_cases(
 ) -> list[Case[EvalInput, EvalOutput, EvalMetadata]]:
     set_identity(identity)
 
+    # Collect the latest annual value per company per concept
     company_values: dict[str, dict[str, tuple[float, str, str]]] = {}
     for ticker in tickers:
         result = _get_company_facts(ticker, cache)

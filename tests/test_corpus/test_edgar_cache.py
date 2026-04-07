@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
 import pandas as pd
 import pytest
 
-from research_assistant.corpus.edgar.cache import EdgarCache, FactsCacheEntry
+from research_assistant.corpus.edgar.cache import EdgarCache, FactsCacheEntry, FilingCacheEntry
 
 
 class TestEdgarCache:
@@ -18,7 +17,7 @@ class TestEdgarCache:
         assert cache.get_filing("AAPL", 2024) is None
 
     def test_filing_cache_hit(self, cache: EdgarCache) -> None:
-        data: dict[str, Any] = {"sections": {"Item 1": "text"}, "filing_date": "2024-11-01"}
+        data: FilingCacheEntry = {"sections": {"Item 1": "text"}, "filing_date": "2024-11-01"}
         cache.put_filing("AAPL", 2024, data)
         result = cache.get_filing("AAPL", 2024)
         assert result == data
@@ -44,11 +43,11 @@ class TestEdgarCache:
     def test_creates_directories(self, tmp_path: Path) -> None:
         nested = tmp_path / "a" / "b" / "c"
         cache = EdgarCache(nested)
-        data: dict[str, Any] = {"sections": {}, "filing_date": "2024-01-01"}
+        data: FilingCacheEntry = {"sections": {}, "filing_date": "2024-01-01"}
         cache.put_filing("MSFT", 2024, data)
         assert cache.get_filing("MSFT", 2024) == data
 
     def test_ticker_normalized_to_uppercase(self, cache: EdgarCache) -> None:
-        data: dict[str, Any] = {"sections": {}, "filing_date": "2024-01-01"}
+        data: FilingCacheEntry = {"sections": {}, "filing_date": "2024-01-01"}
         cache.put_filing("aapl", 2024, data)
         assert cache.get_filing("AAPL", 2024) == data

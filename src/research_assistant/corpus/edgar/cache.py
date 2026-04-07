@@ -12,6 +12,11 @@ import pandas as pd
 logger = logging.getLogger(__name__)
 
 
+class FilingCacheEntry(TypedDict):
+    sections: dict[str, str]
+    filing_date: str
+
+
 class FactsCacheEntry(TypedDict):
     name: str
     facts_df: pd.DataFrame
@@ -22,11 +27,11 @@ class EdgarCache:
         self._filings_dir = cache_dir / "filings"
         self._facts_dir = cache_dir / "facts"
 
-    def get_filing(self, ticker: str, year: int) -> dict[str, Any] | None:
+    def get_filing(self, ticker: str, year: int) -> FilingCacheEntry | None:
         path = self._filing_path(ticker, year)
         return self._load(path)
 
-    def put_filing(self, ticker: str, year: int, data: dict[str, Any]) -> None:
+    def put_filing(self, ticker: str, year: int, data: FilingCacheEntry) -> None:
         path = self._filing_path(ticker, year)
         self._save(path, data)
 

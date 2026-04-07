@@ -2,13 +2,12 @@ from __future__ import annotations
 
 import logging
 from datetime import date
-from typing import Any
 
 from edgar import Company, set_identity
 from edgar.company_reports.ten_k import TenK
 from edgar.entity.filings import EntityFiling, EntityFilings
 
-from research_assistant.corpus.edgar.cache import EdgarCache
+from research_assistant.corpus.edgar.cache import EdgarCache, FilingCacheEntry
 from research_assistant.corpus.edgar.metadata import EdgarMetadata
 from research_assistant.corpus.models import Document
 
@@ -35,15 +34,12 @@ class EdgarParser:
             return self._build_document(ticker, year, cached)
 
         sections, filing_date = self._fetch_filing(ticker, year)
+        data: FilingCacheEntry = {"sections": sections, "filing_date": filing_date.isoformat()}
 
         if self._cache is not None:
-            self._cache.put_filing(
-                ticker, year, {"sections": sections, "filing_date": filing_date.isoformat()}
-            )
+            self._cache.put_filing(ticker, year, data)
 
-        return self._build_document(
-            ticker, year, {"sections": sections, "filing_date": filing_date.isoformat()}
-        )
+        return self._build_document(ticker, year, data)
 
     def _fetch_filing(self, ticker: str, year: int) -> tuple[dict[str, str], date]:
         company = Company(ticker)
@@ -68,7 +64,7 @@ class EdgarParser:
         filing_date = date.fromisoformat(str(filing.filing_date))
         return sections, filing_date
 
-    def _build_document(self, ticker: str, year: int, data: dict[str, Any]) -> Document:
+    def _build_document(self, ticker: str, year: int, data: FilingCacheEntry) -> Document:
         sections: dict[str, str] = data["sections"]
         filing_date = date.fromisoformat(data["filing_date"])
 
