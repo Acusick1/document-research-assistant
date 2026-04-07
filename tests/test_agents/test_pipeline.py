@@ -28,6 +28,8 @@ def _result(**overrides: object) -> SearchResult:
         "chunk_index": 0,
         "ticker": "AAPL",
         "period": "FY2024",
+        "filing_type": "10-K",
+        "source": "edgar",
     }
     return SearchResult(**(defaults | overrides))  # type: ignore[arg-type]
 

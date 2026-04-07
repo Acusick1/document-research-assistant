@@ -41,7 +41,7 @@ class AgentResponse(BaseModel):
     )
 
 
-def create_agent(model: str = "anthropic:claude-sonnet-4-6") -> Agent[None, AgentResponse]:
+def create_agent(model: str) -> Agent[None, AgentResponse]:
     return Agent(  # type: ignore[return-value]
         model,
         system_prompt=EDGAR_INSTRUCTIONS,

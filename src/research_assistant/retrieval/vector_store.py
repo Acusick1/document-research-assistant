@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from qdrant_client import QdrantClient
 from qdrant_client.models import (
     Distance,
@@ -19,6 +19,8 @@ from research_assistant.corpus.models import Chunk
 
 
 class SearchResult(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
     id: str
     score: float
     text: str
@@ -26,10 +28,10 @@ class SearchResult(BaseModel):
     document_id: str
     section_name: str
     chunk_index: int
-    ticker: str = ""
-    period: str = ""
-    filing_type: str = ""
-    source: str = ""
+    ticker: str
+    period: str
+    filing_type: str
+    source: str
 
 
 def _str_to_uuid(s: str) -> str:

@@ -104,6 +104,28 @@ class TestContextPrecision:
         result = evaluator.evaluate(ctx)
         assert result.value == 0.0
 
+    def test_multi_company_all_relevant(self) -> None:
+        evaluator = ContextPrecision()
+        ctx = _make_context(
+            output=EvalOutput(sources=["AAPL_chunk1", "MSFT_chunk2"]),
+            metadata=EvalMetadata(
+                category="comparison", companies=["AAPL", "MSFT"]
+            ),
+        )
+        result = evaluator.evaluate(ctx)
+        assert result.value == 1.0
+
+    def test_multi_company_partial(self) -> None:
+        evaluator = ContextPrecision()
+        ctx = _make_context(
+            output=EvalOutput(sources=["AAPL_chunk1", "NVDA_chunk2"]),
+            metadata=EvalMetadata(
+                category="comparison", companies=["AAPL", "MSFT"]
+            ),
+        )
+        result = evaluator.evaluate(ctx)
+        assert result.value == 0.5
+
 
 class TestFaithfulness:
     @pytest.mark.anyio
