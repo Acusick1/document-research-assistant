@@ -17,6 +17,7 @@ cases:
     numeric_answer: null
     sources: []
   evaluators:
+  - AnswerContains
   - ContextPrecision
 - name: aapl_vs_googl_revenue
   inputs:
@@ -34,6 +35,7 @@ cases:
     numeric_answer: null
     sources: []
   evaluators:
+  - AnswerContains
   - ContextPrecision
 - name: aapl_vs_amzn_revenue
   inputs:
@@ -51,6 +53,7 @@ cases:
     numeric_answer: null
     sources: []
   evaluators:
+  - AnswerContains
   - ContextPrecision
 - name: aapl_vs_msft_net_income
   inputs:
@@ -68,6 +71,7 @@ cases:
     numeric_answer: null
     sources: []
   evaluators:
+  - AnswerContains
   - ContextPrecision
 - name: aapl_vs_googl_net_income
   inputs:
@@ -85,6 +89,7 @@ cases:
     numeric_answer: null
     sources: []
   evaluators:
+  - AnswerContains
   - ContextPrecision
 - name: aapl_vs_amzn_net_income
   inputs:
@@ -102,6 +107,7 @@ cases:
     numeric_answer: null
     sources: []
   evaluators:
+  - AnswerContains
   - ContextPrecision
 - name: aapl_vs_msft_total_assets
   inputs:
@@ -119,6 +125,7 @@ cases:
     numeric_answer: null
     sources: []
   evaluators:
+  - AnswerContains
   - ContextPrecision
 - name: aapl_vs_googl_total_assets
   inputs:
@@ -136,6 +143,7 @@ cases:
     numeric_answer: null
     sources: []
   evaluators:
+  - AnswerContains
   - ContextPrecision
 - name: aapl_vs_amzn_total_assets
   inputs:
@@ -153,6 +161,7 @@ cases:
     numeric_answer: null
     sources: []
   evaluators:
+  - AnswerContains
   - ContextPrecision
 - name: aapl_vs_msft_total_liabilities
   inputs:
@@ -170,6 +179,7 @@ cases:
     numeric_answer: null
     sources: []
   evaluators:
+  - AnswerContains
   - ContextPrecision
 - name: aapl_vs_googl_total_liabilities
   inputs:
@@ -187,6 +197,7 @@ cases:
     numeric_answer: null
     sources: []
   evaluators:
+  - AnswerContains
   - ContextPrecision
 - name: aapl_vs_meta_total_liabilities
   inputs:
@@ -204,6 +215,7 @@ cases:
     numeric_answer: null
     sources: []
   evaluators:
+  - AnswerContains
   - ContextPrecision
 - name: aapl_vs_msft_operating_income
   inputs:
@@ -221,6 +233,7 @@ cases:
     numeric_answer: null
     sources: []
   evaluators:
+  - AnswerContains
   - ContextPrecision
 - name: aapl_vs_googl_operating_income
   inputs:
@@ -238,6 +251,7 @@ cases:
     numeric_answer: null
     sources: []
   evaluators:
+  - AnswerContains
   - ContextPrecision
 - name: aapl_vs_amzn_operating_income
   inputs:
@@ -255,6 +269,7 @@ cases:
     numeric_answer: null
     sources: []
   evaluators:
+  - AnswerContains
   - ContextPrecision
 - name: aapl_vs_msft_cost_of_revenue
   inputs:
@@ -272,6 +287,7 @@ cases:
     numeric_answer: null
     sources: []
   evaluators:
+  - AnswerContains
   - ContextPrecision
 - name: aapl_vs_googl_cost_of_revenue
   inputs:
@@ -289,6 +305,7 @@ cases:
     numeric_answer: null
     sources: []
   evaluators:
+  - AnswerContains
   - ContextPrecision
 - name: aapl_vs_amzn_cost_of_revenue
   inputs:
@@ -306,6 +323,7 @@ cases:
     numeric_answer: null
     sources: []
   evaluators:
+  - AnswerContains
   - ContextPrecision
 - name: aapl_vs_msft_gross_profit
   inputs:
@@ -323,6 +341,7 @@ cases:
     numeric_answer: null
     sources: []
   evaluators:
+  - AnswerContains
   - ContextPrecision
 - name: aapl_vs_nvda_gross_profit
   inputs:
@@ -340,6 +359,7 @@ cases:
     numeric_answer: null
     sources: []
   evaluators:
+  - AnswerContains
   - ContextPrecision
 - name: msft_vs_nvda_gross_profit
   inputs:
@@ -357,6 +377,7 @@ cases:
     numeric_answer: null
     sources: []
   evaluators:
+  - AnswerContains
   - ContextPrecision
 - name: aapl_vs_msft_research_and_development
   inputs:
@@ -374,6 +395,7 @@ cases:
     numeric_answer: null
     sources: []
   evaluators:
+  - AnswerContains
   - ContextPrecision
 - name: aapl_vs_googl_research_and_development
   inputs:
@@ -391,6 +413,7 @@ cases:
     numeric_answer: null
     sources: []
   evaluators:
+  - AnswerContains
   - ContextPrecision
 - name: aapl_vs_meta_research_and_development
   inputs:
@@ -408,6 +431,7 @@ cases:
     numeric_answer: null
     sources: []
   evaluators:
+  - AnswerContains
   - ContextPrecision
 - name: aapl_vs_msft_stockholders_equity
   inputs:
@@ -425,6 +449,7 @@ cases:
     numeric_answer: null
     sources: []
   evaluators:
+  - AnswerContains
   - ContextPrecision
 - name: aapl_vs_googl_stockholders_equity
   inputs:
@@ -442,6 +467,7 @@ cases:
     numeric_answer: null
     sources: []
   evaluators:
+  - AnswerContains
   - ContextPrecision
 - name: aapl_vs_amzn_stockholders_equity
   inputs:
@@ -459,6 +485,7 @@ cases:
     numeric_answer: null
     sources: []
   evaluators:
+  - AnswerContains
   - ContextPrecision
 - name: aapl_vs_msft_operating_cash_flow
   inputs:
@@ -476,6 +503,7 @@ cases:
     numeric_answer: null
     sources: []
   evaluators:
+  - AnswerContains
   - ContextPrecision
 - name: aapl_vs_googl_operating_cash_flow
   inputs:
@@ -493,6 +521,7 @@ cases:
     numeric_answer: null
     sources: []
   evaluators:
+  - AnswerContains
   - ContextPrecision
 - name: aapl_vs_amzn_operating_cash_flow
   inputs:
@@ -510,6 +539,7 @@ cases:
     numeric_answer: null
     sources: []
   evaluators:
+  - AnswerContains
   - ContextPrecision
 evaluators: []
 report_evaluators: []

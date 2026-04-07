@@ -8,6 +8,7 @@ from edgar import Company, set_identity
 from pydantic_evals import Case
 
 from research_assistant.corpus.edgar.cache import EdgarCache, FactsCacheEntry, facts_key
+from research_assistant.eval.evaluators.answer_contains import AnswerContains
 from research_assistant.eval.evaluators.context_precision import ContextPrecision
 from research_assistant.eval.evaluators.numeric_match import NumericMatch
 from research_assistant.eval.models import EvalInput, EvalMetadata, EvalOutput
@@ -266,7 +267,7 @@ def generate_comparison_cases(
                     company=higher_ticker,
                     metric=concept,
                 ),
-                evaluators=(ContextPrecision(),),
+                evaluators=(AnswerContains(), ContextPrecision()),
             )
             cases.append(case)
             pairs_used += 1

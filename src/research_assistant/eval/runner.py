@@ -10,6 +10,7 @@ from pydantic_evals.evaluators.llm_as_a_judge import set_default_judge_model
 from pydantic_evals.reporting import EvaluationReport
 
 from research_assistant.config import Settings, get_settings
+from research_assistant.eval.evaluators.answer_contains import AnswerContains
 from research_assistant.eval.evaluators.context_precision import ContextPrecision
 from research_assistant.eval.evaluators.faithfulness import Faithfulness
 from research_assistant.eval.evaluators.numeric_match import NumericMatch
@@ -17,7 +18,7 @@ from research_assistant.eval.models import EvalInput, EvalMetadata, EvalOutput
 
 type TaskFn = Callable[[EvalInput], Awaitable[EvalOutput]]
 
-CUSTOM_EVALUATORS = (NumericMatch, ContextPrecision, Faithfulness)
+CUSTOM_EVALUATORS = (AnswerContains, NumericMatch, ContextPrecision, Faithfulness)
 
 
 def _configure_judge_model() -> None:
