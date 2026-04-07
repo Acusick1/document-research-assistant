@@ -26,10 +26,7 @@ def _format_context(results: list[SearchResult]) -> str:
 
 
 def _sources_from_results(results: list[SearchResult]) -> list[str]:
-    return [
-        f"[{r.ticker} {r.period} {r.section_name}] {r.text[:200]}"
-        for r in results
-    ]
+    return [f"[{r.ticker} {r.period} {r.section_name}] {r.text[:200]}" for r in results]
 
 
 class RagPipeline:

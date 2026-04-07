@@ -53,9 +53,7 @@ def chunks() -> list[Chunk]:
 
 
 class TestIngestChunks:
-    def test_ingests_and_returns_count(
-        self, chunks: list[Chunk], store: QdrantStore
-    ) -> None:
+    def test_ingests_and_returns_count(self, chunks: list[Chunk], store: QdrantStore) -> None:
         result = ingest_chunks(chunks, FakeEmbedder(), store)
         assert result == 3
         assert store.count() == 3

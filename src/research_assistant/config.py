@@ -29,6 +29,8 @@ class Settings(BaseSettings):
 
     top_k: int = 5
 
+    cache_dir: Path = Path(".cache/edgar")
+
     datasets_dir: Path = _DEFAULT_DATASETS_DIR
 
     logfire_token: SecretStr | None = None

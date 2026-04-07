@@ -55,8 +55,7 @@ async def main() -> None:
             if isinstance(case.metadata, EvalMetadata):
                 category = case.metadata.category
             assertion_pass = (
-                sum(1 for a in case.assertions.values() if a.value)
-                / len(case.assertions)
+                sum(1 for a in case.assertions.values() if a.value) / len(case.assertions)
                 if case.assertions
                 else None
             )

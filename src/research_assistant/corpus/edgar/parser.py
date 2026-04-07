@@ -1,24 +1,49 @@
 from __future__ import annotations
 
+import logging
 from datetime import date
+from typing import Any
 
 from edgar import Company, set_identity
 from edgar.company_reports.ten_k import TenK
 from edgar.entity.filings import EntityFiling, EntityFilings
 
+from research_assistant.corpus.edgar.cache import EdgarCache
 from research_assistant.corpus.edgar.metadata import EdgarMetadata
 from research_assistant.corpus.models import Document
 
-# Standard 10-K sections mandated by the SEC (Items 1-16).
-# This subset covers business overview, risks, MD&A, and financials.
+logger = logging.getLogger(__name__)
+
 TARGET_ITEMS = ["Item 1", "Item 1A", "Item 7", "Item 7A", "Item 8"]
 
 
 class EdgarParser:
-    def __init__(self, identity: str = "ResearchAssistant research@example.com") -> None:
+    def __init__(
+        self,
+        identity: str = "ResearchAssistant research@example.com",
+        cache: EdgarCache | None = None,
+    ) -> None:
         set_identity(identity)
+        self._cache = cache
 
     def parse(self, ticker: str, year: int) -> Document:
+        cached = self._cache.get_filing(ticker, year) if self._cache else None
+        if cached is not None:
+            logger.info("Cache hit for %s FY%d", ticker, year)
+            return self._build_document(ticker, year, cached)
+
+        sections, filing_date = self._fetch_filing(ticker, year)
+
+        if self._cache is not None:
+            self._cache.put_filing(
+                ticker, year, {"sections": sections, "filing_date": filing_date.isoformat()}
+            )
+
+        return self._build_document(
+            ticker, year, {"sections": sections, "filing_date": filing_date.isoformat()}
+        )
+
+    def _fetch_filing(self, ticker: str, year: int) -> tuple[dict[str, str], date]:
         company = Company(ticker)
         filings = company.get_filings(form="10-K")
 
@@ -39,6 +64,12 @@ class EdgarParser:
                 continue
 
         filing_date = date.fromisoformat(str(filing.filing_date))
+        return sections, filing_date
+
+    def _build_document(self, ticker: str, year: int, data: dict[str, Any]) -> Document:
+        sections: dict[str, str] = data["sections"]
+        filing_date = date.fromisoformat(data["filing_date"])
+
         metadata = EdgarMetadata(
             source="edgar",
             ticker=ticker.upper(),
@@ -59,9 +90,7 @@ class EdgarParser:
             raw_text=raw_text,
         )
 
-    def _find_filing_for_year(
-        self, filings: EntityFilings, year: int
-    ) -> EntityFiling:
+    def _find_filing_for_year(self, filings: EntityFilings, year: int) -> EntityFiling:
         for filing in filings:
             filing_date = date.fromisoformat(str(filing.filing_date))
             if filing_date.year == year or filing_date.year == year + 1:

@@ -103,10 +103,7 @@ class QdrantStore:
         qdrant_filter = None
         if filters:
             qdrant_filter = Filter(
-                must=[
-                    FieldCondition(key=k, match=MatchValue(value=v))
-                    for k, v in filters.items()
-                ]
+                must=[FieldCondition(key=k, match=MatchValue(value=v)) for k, v in filters.items()]
             )
 
         results = self.client.query_points(

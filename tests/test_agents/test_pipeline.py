@@ -108,9 +108,7 @@ class TestRagPipeline:
         return store
 
     @pytest.mark.anyio
-    async def test_wiring(
-        self, settings: Settings, populated_store: QdrantStore
-    ) -> None:
+    async def test_wiring(self, settings: Settings, populated_store: QdrantStore) -> None:
         mock_response = AgentResponse(
             answer="Apple's revenue was $391B",
             numeric_answer=391_035_000_000.0,

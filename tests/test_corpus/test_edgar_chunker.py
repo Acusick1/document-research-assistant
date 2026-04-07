@@ -82,5 +82,6 @@ class TestEdgarChunker:
         chunks = chunker.chunk(sample_document)
         for chunk in chunks:
             from research_assistant.corpus.edgar.metadata import EdgarMetadata
+
             assert isinstance(chunk.metadata, EdgarMetadata)
             assert chunk.metadata.ticker == "AAPL"
