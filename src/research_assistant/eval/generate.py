@@ -3,10 +3,11 @@ from __future__ import annotations
 import logging
 
 import pandas as pd
+from diskcache import Cache
 from edgar import Company, set_identity
 from pydantic_evals import Case
 
-from research_assistant.corpus.edgar.cache import EdgarCache, FactsCacheEntry
+from research_assistant.corpus.edgar.cache import facts_key
 from research_assistant.eval.evaluators.numeric_match import NumericMatch
 from research_assistant.eval.models import EvalInput, EvalMetadata, EvalOutput
 
@@ -50,9 +51,10 @@ XBRL_TAG_MAP: dict[str, list[str]] = {
 MIN_ANNUAL_DAYS = 300
 
 
-def _get_company_facts(ticker: str, cache: EdgarCache | None) -> tuple[str, pd.DataFrame] | None:
+def _get_company_facts(ticker: str, cache: Cache | None) -> tuple[str, pd.DataFrame] | None:
+    key = facts_key(ticker)
     if cache is not None:
-        cached = cache.get_facts(ticker)
+        cached = cache.get(key)
         if cached is not None:
             logger.info("Cache hit for %s XBRL facts", ticker)
             return cached["name"], cached["facts_df"]
@@ -65,8 +67,7 @@ def _get_company_facts(ticker: str, cache: EdgarCache | None) -> tuple[str, pd.D
     facts_df: pd.DataFrame = facts.to_dataframe()
 
     if cache is not None:
-        entry: FactsCacheEntry = {"name": name, "facts_df": facts_df}
-        cache.put_facts(ticker, entry)
+        cache.set(key, {"name": name, "facts_df": facts_df})
 
     return name, facts_df
 
@@ -121,7 +122,7 @@ def generate_factual_cases(
     tickers: list[str],
     identity: str = "ResearchAssistant research@example.com",
     min_year: int = 2022,
-    cache: EdgarCache | None = None,
+    cache: Cache | None = None,
 ) -> list[Case[EvalInput, EvalOutput, EvalMetadata]]:
     set_identity(identity)
     cases: list[Case[EvalInput, EvalOutput, EvalMetadata]] = []
@@ -201,7 +202,7 @@ def _log_coverage(
 def generate_comparison_cases(
     tickers: list[str],
     identity: str = "ResearchAssistant research@example.com",
-    cache: EdgarCache | None = None,
+    cache: Cache | None = None,
 ) -> list[Case[EvalInput, EvalOutput, EvalMetadata]]:
     set_identity(identity)
 

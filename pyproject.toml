@@ -12,6 +12,7 @@ dependencies = [
     "fastembed",
     "edgartools",
     "logfire",
+    "diskcache>=5.6.3",
 ]
 
 [dependency-groups]

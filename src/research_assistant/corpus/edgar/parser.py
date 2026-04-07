@@ -3,11 +3,12 @@ from __future__ import annotations
 import logging
 from datetime import date
 
+from diskcache import Cache
 from edgar import Company, set_identity
 from edgar.company_reports.ten_k import TenK
 from edgar.entity.filings import EntityFiling, EntityFilings
 
-from research_assistant.corpus.edgar.cache import EdgarCache, FilingCacheEntry
+from research_assistant.corpus.edgar.cache import filing_key
 from research_assistant.corpus.edgar.metadata import EdgarMetadata
 from research_assistant.corpus.models import Document
 
@@ -17,27 +18,28 @@ logger = logging.getLogger(__name__)
 # This subset covers business overview, risks, MD&A, and financials.
 TARGET_ITEMS = ["Item 1", "Item 1A", "Item 7", "Item 7A", "Item 8"]
 
-
 class EdgarParser:
     def __init__(
         self,
         identity: str = "ResearchAssistant research@example.com",
-        cache: EdgarCache | None = None,
+        cache: Cache | None = None,
     ) -> None:
         set_identity(identity)
         self._cache = cache
 
     def parse(self, ticker: str, year: int) -> Document:
-        cached = self._cache.get_filing(ticker, year) if self._cache else None
-        if cached is not None:
-            logger.info("Cache hit for %s FY%d", ticker, year)
-            return self._build_document(ticker, year, cached)
+        key = filing_key(ticker, year)
+        if self._cache is not None:
+            cached = self._cache.get(key)
+            if cached is not None:
+                logger.info("Cache hit for %s FY%d", ticker, year)
+                return self._build_document(ticker, year, cached)
 
         sections, filing_date = self._fetch_filing(ticker, year)
-        data: FilingCacheEntry = {"sections": sections, "filing_date": filing_date.isoformat()}
+        data = {"sections": sections, "filing_date": filing_date.isoformat()}
 
         if self._cache is not None:
-            self._cache.put_filing(ticker, year, data)
+            self._cache.set(key, data)
 
         return self._build_document(ticker, year, data)
 
@@ -64,7 +66,7 @@ class EdgarParser:
         filing_date = date.fromisoformat(str(filing.filing_date))
         return sections, filing_date
 
-    def _build_document(self, ticker: str, year: int, data: FilingCacheEntry) -> Document:
+    def _build_document(self, ticker: str, year: int, data: dict[str, str]) -> Document:
         sections: dict[str, str] = data["sections"]
         filing_date = date.fromisoformat(data["filing_date"])
 

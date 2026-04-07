@@ -7,7 +7,7 @@ from pathlib import Path
 from pydantic_evals import Dataset
 
 from research_assistant.config import get_settings
-from research_assistant.corpus.edgar.cache import EdgarCache
+from research_assistant.corpus.edgar.cache import create_cache
 from research_assistant.eval.generate import generate_comparison_cases, generate_factual_cases
 from research_assistant.eval.models import EvalInput, EvalMetadata, EvalOutput
 
@@ -30,7 +30,7 @@ def main() -> None:
     logging.basicConfig(level="INFO")
     args.output_dir.mkdir(parents=True, exist_ok=True)
 
-    cache: EdgarCache | None = None if args.no_cache else EdgarCache(settings.cache_dir)
+    cache = None if args.no_cache else create_cache(settings.cache_dir)
 
     logger.info("Generating factual cases for %s", args.tickers)
     factual_cases = generate_factual_cases(

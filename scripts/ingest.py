@@ -4,7 +4,7 @@ import argparse
 import logging
 
 from research_assistant.config import Settings, configure_logfire
-from research_assistant.corpus.edgar.cache import EdgarCache
+from research_assistant.corpus.edgar.cache import create_cache
 from research_assistant.corpus.edgar.chunker import EdgarChunker
 from research_assistant.corpus.edgar.parser import EdgarParser
 from research_assistant.retrieval.embeddings import FastEmbedEmbedder
@@ -30,7 +30,7 @@ def main() -> None:
     configure_logfire(settings)
     logging.basicConfig(level=settings.log_level)
 
-    cache: EdgarCache | None = None if args.no_cache else EdgarCache(settings.cache_dir)
+    cache = None if args.no_cache else create_cache(settings.cache_dir)
     edgar_parser = EdgarParser(identity=args.identity, cache=cache)
     chunker = EdgarChunker(max_tokens=settings.chunk_max_tokens)
     embedder = FastEmbedEmbedder(model_name=settings.embedding_model)
