@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import logging
 
+from pydantic_ai.settings import ModelSettings
+
 from research_assistant.agents.simple import create_agent
 from research_assistant.config import Settings, get_settings
 from research_assistant.eval.models import EvalInput, EvalOutput
@@ -50,7 +52,7 @@ class RagPipeline:
         logger.debug("RAG prompt (%d retrieved chunks):\n%s", len(results), prompt[:500])
 
         response = await self._agent.run(
-            prompt, model_settings={"max_tokens": self._max_tokens}
+            prompt, model_settings=ModelSettings(max_tokens=self._max_tokens),
         )
         output = response.output
 

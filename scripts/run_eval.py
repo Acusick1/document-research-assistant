@@ -5,7 +5,7 @@ import asyncio
 import logging
 from collections import defaultdict
 
-from research_assistant.config import Settings, configure_logfire
+from research_assistant.config import configure_logfire, get_settings
 from research_assistant.eval.models import EvalMetadata
 from research_assistant.eval.runner import run_all_evals
 from research_assistant.pipeline import RagPipeline
@@ -30,7 +30,7 @@ def parse_args() -> argparse.Namespace:
 
 async def main() -> None:
     args = parse_args()
-    settings = Settings()
+    settings = get_settings()
     configure_logfire(settings)
     logging.basicConfig(level=settings.log_level)
 

@@ -49,8 +49,8 @@ def main() -> None:
 
     logger.info("Generating comparison cases for %s", args.tickers)
     comparison_cases = generate_comparison_cases(
-        args.tickers, identity=args.identity, cache=cache,
-        max_pairs_per_concept=args.max_comparison_pairs,
+        args.tickers, identity=args.identity, min_year=args.min_year,
+        cache=cache, max_pairs_per_concept=args.max_comparison_pairs,
     )
     logger.info("Generated %d comparison cases", len(comparison_cases))
 

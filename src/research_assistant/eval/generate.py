@@ -8,6 +8,7 @@ from edgar import Company, set_identity
 from pydantic_evals import Case
 
 from research_assistant.corpus.edgar.cache import EdgarCache, FactsCacheEntry, facts_key
+from research_assistant.eval.evaluators.context_precision import ContextPrecision
 from research_assistant.eval.evaluators.numeric_match import NumericMatch
 from research_assistant.eval.models import EvalInput, EvalMetadata, EvalOutput
 
@@ -204,6 +205,7 @@ def _log_coverage(
 def generate_comparison_cases(
     tickers: list[str],
     identity: str = "ResearchAssistant research@example.com",
+    min_year: int = 2022,
     cache: EdgarCache | None = None,
     max_pairs_per_concept: int = 3,
 ) -> list[Case[EvalInput, EvalOutput, EvalMetadata]]:
@@ -220,7 +222,7 @@ def generate_comparison_cases(
 
         values: dict[str, tuple[float, str, str]] = {}
         for concept, _ in FACTUAL_CONCEPTS:
-            annual = _get_annual_values(facts_df, concept)
+            annual = _get_annual_values(facts_df, concept, min_year=min_year)
             if annual:
                 latest_fy = max(annual.keys())
                 values[concept] = (annual[latest_fy], name, latest_fy)
@@ -264,6 +266,7 @@ def generate_comparison_cases(
                     company=higher_ticker,
                     metric=concept,
                 ),
+                evaluators=(ContextPrecision(),),
             )
             cases.append(case)
             pairs_used += 1
