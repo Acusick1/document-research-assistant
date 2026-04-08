@@ -59,7 +59,10 @@ async def run_eval(
         custom_evaluator_types=CUSTOM_EVALUATORS,
     )
     if max_cases is not None:
-        dataset = Dataset(name=dataset.name, cases=dataset.cases[:max_cases])
+        dataset = Dataset(
+            name=dataset.name, cases=dataset.cases[:max_cases],
+            evaluators=dataset.evaluators, report_evaluators=dataset.report_evaluators,
+        )
     return await dataset.evaluate(
         task,
         name=experiment_name,
