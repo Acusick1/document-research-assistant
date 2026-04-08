@@ -31,7 +31,7 @@ def _build_metadata(settings: Settings) -> dict[str, Any]:
         commit = subprocess.check_output(
             ["git", "rev-parse", "--short", "HEAD"], text=True,
         ).strip()
-    except subprocess.SubprocessError:
+    except (subprocess.SubprocessError, FileNotFoundError):
         commit = "unknown"
     return {
         "commit": commit,
@@ -50,7 +50,6 @@ async def run_eval(
     experiment_name: str | None = None,
     metadata: dict[str, Any] | None = None,
 ) -> EvaluationReport[EvalInput, EvalOutput, EvalMetadata]:
-    _configure_judge_model()
     dataset = Dataset[EvalInput, EvalOutput, EvalMetadata].from_file(
         dataset_path,
         custom_evaluator_types=CUSTOM_EVALUATORS,
@@ -74,6 +73,7 @@ async def run_all_evals(
     max_concurrency: int = 1,
     experiment_name: str | None = None,
 ) -> dict[str, EvaluationReport[EvalInput, EvalOutput, EvalMetadata]]:
+    _configure_judge_model()
     settings = get_settings()
     datasets_dir = datasets_dir or settings.datasets_dir
     metadata = _build_metadata(settings)

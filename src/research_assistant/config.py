@@ -51,8 +51,9 @@ def get_settings() -> Settings:
 
 def configure_logfire(settings: Settings | None = None) -> None:
     settings = settings or get_settings()
+    if not settings.logfire_token:
+        return
     import logfire
 
-    token = settings.logfire_token.get_secret_value() if settings.logfire_token else None
-    logfire.configure(token=token)
+    logfire.configure(token=settings.logfire_token.get_secret_value())
     logfire.instrument_pydantic_ai()
