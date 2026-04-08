@@ -73,7 +73,7 @@ class EdgarParser:
     def _build_document(self, ticker: str, year: int, data: FilingCacheEntry) -> Document:
         sections = data["sections"]
         filing_date = date.fromisoformat(data["filing_date"])
-        company_name = data.get("company_name", "")
+        company_name = data["company_name"]
 
         metadata = EdgarMetadata(
             source="edgar",

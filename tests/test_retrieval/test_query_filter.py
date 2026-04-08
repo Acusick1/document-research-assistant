@@ -77,10 +77,10 @@ class TestResolve:
         result = extractor._resolve(entities)
         assert result.tickers == ["GOOGL"]
 
-    def test_google_matches_via_substring(self, extractor: QueryFilterExtractor) -> None:
+    def test_google_does_not_match(self, extractor: QueryFilterExtractor) -> None:
         entities = ExtractedEntities(companies=["Google"], years=[])
         result = extractor._resolve(entities)
-        assert result.tickers == ["GOOGL"]
+        assert result.tickers == []
 
 
 class TestToQdrantFilters:

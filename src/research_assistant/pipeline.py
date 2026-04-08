@@ -48,7 +48,7 @@ class RagPipeline:
     async def __call__(self, eval_input: EvalInput) -> EvalOutput:
         filters = await self._filter_extractor.extract(eval_input.query)
         query_vector = self._embedder.embed([eval_input.query])[0].tolist()
-        results = self._store.search(query_vector, top_k=self._top_k, filters=filters or None)
+        results = self._store.search(query_vector, top_k=self._top_k, filters=filters)
 
         context = _format_context(results)
         sources = _sources_from_results(results)

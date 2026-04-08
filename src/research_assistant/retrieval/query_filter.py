@@ -58,6 +58,7 @@ class QueryFilterExtractor:
         ticker_hits = store.get_field_values("ticker")
         tickers = [str(h.value) for h in ticker_hits]
 
+        # One scroll per ticker to pair ticker → company_name (N+1, fine for small corpus)
         for ticker in tickers:
             mapping[ticker.lower()] = ticker
 
@@ -84,7 +85,11 @@ class QueryFilterExtractor:
         return periods
 
     async def extract(self, query: str) -> dict[str, Any]:
-        result = await self._agent.run(query)
+        try:
+            result = await self._agent.run(query)
+        except Exception:
+            logger.exception("Filter extraction failed, falling back to unfiltered: %r", query)
+            return {}
         entities = result.output
         logger.debug("Extracted entities: %s", entities)
 
@@ -113,9 +118,15 @@ class QueryFilterExtractor:
         if key in self._name_to_ticker:
             return self._name_to_ticker[key]
 
+        # Substring match: extracted key must appear in a mapping key, longest match wins
+        best_match: str | None = None
+        best_len = 0
         for name, ticker in self._name_to_ticker.items():
-            if key in name or name in key:
-                return ticker
+            if key in name and len(name) > best_len:
+                best_match = ticker
+                best_len = len(name)
+        if best_match:
+            return best_match
 
         logger.warning("Could not resolve company %r to a ticker", company)
         return None
