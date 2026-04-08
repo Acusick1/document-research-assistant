@@ -12,13 +12,12 @@ cases:
     - AAPL
     - MSFT
     metric: revenue
+    fiscal_year: null
   expected_output:
     answer: Apple Inc.
     numeric_answer: null
     sources: []
-  evaluators:
-  - AnswerContains
-  - ContextPrecision
+  evaluators: []
 - name: aapl_vs_googl_revenue
   inputs:
     query: Which company had higher total revenue, Apple Inc. (FY2025) or Alphabet
@@ -30,13 +29,12 @@ cases:
     - AAPL
     - GOOGL
     metric: revenue
+    fiscal_year: null
   expected_output:
     answer: Apple Inc.
     numeric_answer: null
     sources: []
-  evaluators:
-  - AnswerContains
-  - ContextPrecision
+  evaluators: []
 - name: aapl_vs_msft_net_income
   inputs:
     query: Which company had higher net income, Apple Inc. (FY2025) or MICROSOFT CORP
@@ -48,13 +46,12 @@ cases:
     - AAPL
     - MSFT
     metric: net_income
+    fiscal_year: null
   expected_output:
     answer: Apple Inc.
     numeric_answer: null
     sources: []
-  evaluators:
-  - AnswerContains
-  - ContextPrecision
+  evaluators: []
 - name: aapl_vs_googl_net_income
   inputs:
     query: Which company had higher net income, Apple Inc. (FY2025) or Alphabet Inc.
@@ -66,13 +63,12 @@ cases:
     - AAPL
     - GOOGL
     metric: net_income
+    fiscal_year: null
   expected_output:
     answer: Alphabet Inc.
     numeric_answer: null
     sources: []
-  evaluators:
-  - AnswerContains
-  - ContextPrecision
+  evaluators: []
 - name: aapl_vs_msft_total_assets
   inputs:
     query: Which company had higher total assets, Apple Inc. (FY2025) or MICROSOFT
@@ -84,13 +80,12 @@ cases:
     - AAPL
     - MSFT
     metric: total_assets
+    fiscal_year: null
   expected_output:
     answer: MICROSOFT CORP
     numeric_answer: null
     sources: []
-  evaluators:
-  - AnswerContains
-  - ContextPrecision
+  evaluators: []
 - name: aapl_vs_googl_total_assets
   inputs:
     query: Which company had higher total assets, Apple Inc. (FY2025) or Alphabet
@@ -102,13 +97,12 @@ cases:
     - AAPL
     - GOOGL
     metric: total_assets
+    fiscal_year: null
   expected_output:
     answer: Alphabet Inc.
     numeric_answer: null
     sources: []
-  evaluators:
-  - AnswerContains
-  - ContextPrecision
+  evaluators: []
 - name: aapl_vs_msft_total_liabilities
   inputs:
     query: Which company had higher total liabilities, Apple Inc. (FY2025) or MICROSOFT
@@ -120,13 +114,12 @@ cases:
     - AAPL
     - MSFT
     metric: total_liabilities
+    fiscal_year: null
   expected_output:
     answer: Apple Inc.
     numeric_answer: null
     sources: []
-  evaluators:
-  - AnswerContains
-  - ContextPrecision
+  evaluators: []
 - name: aapl_vs_googl_total_liabilities
   inputs:
     query: Which company had higher total liabilities, Apple Inc. (FY2025) or Alphabet
@@ -138,13 +131,12 @@ cases:
     - AAPL
     - GOOGL
     metric: total_liabilities
+    fiscal_year: null
   expected_output:
     answer: Apple Inc.
     numeric_answer: null
     sources: []
-  evaluators:
-  - AnswerContains
-  - ContextPrecision
+  evaluators: []
 - name: aapl_vs_msft_operating_income
   inputs:
     query: Which company had higher operating income, Apple Inc. (FY2025) or MICROSOFT
@@ -156,13 +148,12 @@ cases:
     - AAPL
     - MSFT
     metric: operating_income
+    fiscal_year: null
   expected_output:
     answer: Apple Inc.
     numeric_answer: null
     sources: []
-  evaluators:
-  - AnswerContains
-  - ContextPrecision
+  evaluators: []
 - name: aapl_vs_googl_operating_income
   inputs:
     query: Which company had higher operating income, Apple Inc. (FY2025) or Alphabet
@@ -174,13 +165,12 @@ cases:
     - AAPL
     - GOOGL
     metric: operating_income
+    fiscal_year: null
   expected_output:
     answer: Apple Inc.
     numeric_answer: null
     sources: []
-  evaluators:
-  - AnswerContains
-  - ContextPrecision
+  evaluators: []
 - name: aapl_vs_msft_cost_of_revenue
   inputs:
     query: Which company had higher cost of revenue, Apple Inc. (FY2025) or MICROSOFT
@@ -192,13 +182,12 @@ cases:
     - AAPL
     - MSFT
     metric: cost_of_revenue
+    fiscal_year: null
   expected_output:
     answer: Apple Inc.
     numeric_answer: null
     sources: []
-  evaluators:
-  - AnswerContains
-  - ContextPrecision
+  evaluators: []
 - name: aapl_vs_googl_cost_of_revenue
   inputs:
     query: Which company had higher cost of revenue, Apple Inc. (FY2025) or Alphabet
@@ -210,13 +199,12 @@ cases:
     - AAPL
     - GOOGL
     metric: cost_of_revenue
+    fiscal_year: null
   expected_output:
     answer: Apple Inc.
     numeric_answer: null
     sources: []
-  evaluators:
-  - AnswerContains
-  - ContextPrecision
+  evaluators: []
 - name: aapl_vs_msft_gross_profit
   inputs:
     query: Which company had higher gross profit, Apple Inc. (FY2025) or MICROSOFT
@@ -228,13 +216,12 @@ cases:
     - AAPL
     - MSFT
     metric: gross_profit
+    fiscal_year: null
   expected_output:
     answer: Apple Inc.
     numeric_answer: null
     sources: []
-  evaluators:
-  - AnswerContains
-  - ContextPrecision
+  evaluators: []
 - name: aapl_vs_nvda_gross_profit
   inputs:
     query: Which company had higher gross profit, Apple Inc. (FY2025) or NVIDIA CORP
@@ -246,13 +233,12 @@ cases:
     - AAPL
     - NVDA
     metric: gross_profit
+    fiscal_year: null
   expected_output:
     answer: Apple Inc.
     numeric_answer: null
     sources: []
-  evaluators:
-  - AnswerContains
-  - ContextPrecision
+  evaluators: []
 - name: aapl_vs_msft_research_and_development
   inputs:
     query: Which company had higher R&D spending, Apple Inc. (FY2025) or MICROSOFT
@@ -264,13 +250,12 @@ cases:
     - AAPL
     - MSFT
     metric: research_and_development
+    fiscal_year: null
   expected_output:
     answer: Apple Inc.
     numeric_answer: null
     sources: []
-  evaluators:
-  - AnswerContains
-  - ContextPrecision
+  evaluators: []
 - name: aapl_vs_googl_research_and_development
   inputs:
     query: Which company had higher R&D spending, Apple Inc. (FY2025) or Alphabet
@@ -282,13 +267,12 @@ cases:
     - AAPL
     - GOOGL
     metric: research_and_development
+    fiscal_year: null
   expected_output:
     answer: Alphabet Inc.
     numeric_answer: null
     sources: []
-  evaluators:
-  - AnswerContains
-  - ContextPrecision
+  evaluators: []
 - name: aapl_vs_msft_stockholders_equity
   inputs:
     query: Which company had higher stockholders' equity, Apple Inc. (FY2025) or MICROSOFT
@@ -300,13 +284,12 @@ cases:
     - AAPL
     - MSFT
     metric: stockholders_equity
+    fiscal_year: null
   expected_output:
     answer: MICROSOFT CORP
     numeric_answer: null
     sources: []
-  evaluators:
-  - AnswerContains
-  - ContextPrecision
+  evaluators: []
 - name: aapl_vs_googl_stockholders_equity
   inputs:
     query: Which company had higher stockholders' equity, Apple Inc. (FY2025) or Alphabet
@@ -318,13 +301,12 @@ cases:
     - AAPL
     - GOOGL
     metric: stockholders_equity
+    fiscal_year: null
   expected_output:
     answer: Alphabet Inc.
     numeric_answer: null
     sources: []
-  evaluators:
-  - AnswerContains
-  - ContextPrecision
+  evaluators: []
 - name: aapl_vs_msft_operating_cash_flow
   inputs:
     query: Which company had higher operating cash flow, Apple Inc. (FY2025) or MICROSOFT
@@ -336,13 +318,12 @@ cases:
     - AAPL
     - MSFT
     metric: operating_cash_flow
+    fiscal_year: null
   expected_output:
     answer: MICROSOFT CORP
     numeric_answer: null
     sources: []
-  evaluators:
-  - AnswerContains
-  - ContextPrecision
+  evaluators: []
 - name: aapl_vs_googl_operating_cash_flow
   inputs:
     query: Which company had higher operating cash flow, Apple Inc. (FY2025) or Alphabet
@@ -354,12 +335,13 @@ cases:
     - AAPL
     - GOOGL
     metric: operating_cash_flow
+    fiscal_year: null
   expected_output:
     answer: Alphabet Inc.
     numeric_answer: null
     sources: []
-  evaluators:
-  - AnswerContains
-  - ContextPrecision
-evaluators: []
+  evaluators: []
+evaluators:
+- AnswerContains
+- RetrievalRelevance
 report_evaluators: []

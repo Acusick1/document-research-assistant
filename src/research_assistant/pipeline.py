@@ -8,6 +8,7 @@ from research_assistant.agents.simple import create_agent
 from research_assistant.config import Settings, get_settings
 from research_assistant.eval.models import EvalInput, EvalOutput
 from research_assistant.retrieval.embeddings import FastEmbedEmbedder
+from research_assistant.retrieval.query_filter import QueryFilterExtractor
 from research_assistant.retrieval.vector_store import (
     QdrantStore,
     SearchResult,
@@ -38,12 +39,16 @@ class RagPipeline:
         client = create_qdrant_client(settings)
         self._store = QdrantStore(client, settings.collection_name, self._embedder.dim)
         self._agent = create_agent(model=settings.llm_model)
+        self._filter_extractor = QueryFilterExtractor(
+            store=self._store, model=settings.filter_model,
+        )
         self._top_k = settings.top_k
         self._max_tokens = settings.max_tokens
 
     async def __call__(self, eval_input: EvalInput) -> EvalOutput:
+        filters = await self._filter_extractor.extract(eval_input.query)
         query_vector = self._embedder.embed([eval_input.query])[0].tolist()
-        results = self._store.search(query_vector, top_k=self._top_k)
+        results = self._store.search(query_vector, top_k=self._top_k, filters=filters)
 
         context = _format_context(results)
         sources = _sources_from_results(results)

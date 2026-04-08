@@ -9,7 +9,7 @@ evaluators:
       Minor differences in framing are acceptable if the core facts align.
     include_input: true
     include_expected_output: true
-- ContextPrecision: {}
+- RetrievalRelevance: {}
 report_evaluators: []
 cases:
 - name: highest_revenue_growth_and_risks

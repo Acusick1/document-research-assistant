@@ -36,9 +36,12 @@ class Settings(BaseSettings):
     cache_dir: Path = Path(".cache/edgar")
 
     datasets_dir: Path = _DEFAULT_DATASETS_DIR
+    eval_results_dir: Path = Path("eval_results")
 
     logfire_token: SecretStr | None = None
     log_level: str = "INFO"
+
+    filter_model: str = "anthropic:claude-haiku-4-5-20251001"
 
     eval_judge_model: str = "openai:gpt-5.4-nano"
     openai_api_key: SecretStr | None = None

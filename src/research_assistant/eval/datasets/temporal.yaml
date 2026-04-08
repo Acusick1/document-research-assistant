@@ -8,7 +8,7 @@ evaluators:
       expected output provides them. Minor numerical differences are acceptable.
     include_input: true
     include_expected_output: true
-- ContextPrecision: {}
+- RetrievalRelevance: {}
 report_evaluators: []
 cases:
 - name: apple_revenue_trend_3y

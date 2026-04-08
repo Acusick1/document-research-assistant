@@ -2,11 +2,16 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import json
 import logging
 from collections import defaultdict
+from datetime import UTC, datetime
+from pathlib import Path
+
+from pydantic_evals.reporting import EvaluationReport, EvaluationReportAdapter
 
 from research_assistant.config import configure_logfire, get_settings
-from research_assistant.eval.models import EvalMetadata
+from research_assistant.eval.models import EvalInput, EvalMetadata, EvalOutput
 from research_assistant.eval.runner import run_all_evals
 from research_assistant.pipeline import RagPipeline
 
@@ -29,7 +34,30 @@ def parse_args() -> argparse.Namespace:
         "--concurrency", type=int, default=1,
         help="Max concurrent eval cases (default: 1)",
     )
+    parser.add_argument(
+        "-v", "--verbose", action="store_true",
+        help="Print expected vs actual for failing cases",
+    )
     return parser.parse_args()
+
+
+type ReportDict = dict[str, EvaluationReport[EvalInput, EvalOutput, EvalMetadata]]
+
+
+def _write_results(
+    results: ReportDict,
+    results_dir: Path,
+    experiment_name: str | None,
+) -> None:
+    results_dir.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
+    name = experiment_name or "run"
+    for dataset_name, report in results.items():
+        filename = f"{name}_{dataset_name}_{timestamp}.json"
+        path = results_dir / filename
+        data = json.loads(EvaluationReportAdapter.dump_json(report))
+        path.write_text(json.dumps(data, indent=2))
+        print(f"\n  Results written to {path}")
 
 
 async def main() -> None:
@@ -43,7 +71,7 @@ async def main() -> None:
     logger.info("Running eval suite (concurrency=%d)", args.concurrency)
 
     results = await run_all_evals(
-        task=pipeline, dataset_name=args.dataset, max_cases=args.max_cases,
+        task=pipeline.__call__, dataset_name=args.dataset, max_cases=args.max_cases,
         max_concurrency=args.concurrency, experiment_name=args.name,
     )
 
@@ -53,6 +81,19 @@ async def main() -> None:
         print("=" * 60)
 
         report.print()
+
+        if args.verbose:
+            failing = [c for c in report.cases if any(not a.value for a in c.assertions.values())]
+            if failing:
+                print(f"\n  Failing cases ({len(failing)}):")
+                for case in failing:
+                    print(f"\n    {case.name}:")
+                    if case.expected_output is not None:
+                        print(f"      expected: {case.expected_output}")
+                    print(f"      actual:   {case.output}")
+                    for aname, assertion in case.assertions.items():
+                        if not assertion.value and assertion.reason:
+                            print(f"      {aname}: {assertion.reason}")
 
         if report.failures:
             print(f"\n  Task failures: {len(report.failures)}")
@@ -78,6 +119,9 @@ async def main() -> None:
                     print(f"    {category}: {avg:.0%} ({len(valid)}/{len(rates)} evaluated)")
                 else:
                     print(f"    {category}: no evaluators ({len(rates)} cases)")
+
+    if results:
+        _write_results(results, settings.eval_results_dir, args.name)
 
     if not results:
         print("No datasets found.")

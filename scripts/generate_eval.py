@@ -8,6 +8,9 @@ from pydantic_evals import Dataset
 
 from research_assistant.config import get_settings
 from research_assistant.corpus.edgar.cache import create_cache
+from research_assistant.eval.evaluators.answer_contains import AnswerContains
+from research_assistant.eval.evaluators.numeric_match import NumericMatch
+from research_assistant.eval.evaluators.retrieval_relevance import RetrievalRelevance
 from research_assistant.eval.generate import generate_comparison_cases, generate_factual_cases
 from research_assistant.eval.models import EvalInput, EvalMetadata, EvalOutput
 
@@ -47,7 +50,13 @@ def main() -> None:
     )
     logger.info("Generated %d factual cases", len(factual_cases))
 
-    factual_ds = Dataset[EvalInput, EvalOutput, EvalMetadata](name="factual", cases=factual_cases)
+    factual_ds = Dataset[EvalInput, EvalOutput, EvalMetadata](
+        name="factual", cases=factual_cases,
+        evaluators=[
+            NumericMatch(tolerance_pct=0.05),
+            RetrievalRelevance(),
+        ],
+    )
     factual_path = args.output_dir / "factual.yaml"
     factual_ds.to_file(factual_path)
     logger.info("Wrote %s", factual_path)
@@ -60,7 +69,11 @@ def main() -> None:
     logger.info("Generated %d comparison cases", len(comparison_cases))
 
     comparison_ds = Dataset[EvalInput, EvalOutput, EvalMetadata](
-        name="comparison", cases=comparison_cases
+        name="comparison", cases=comparison_cases,
+        evaluators=[
+            AnswerContains(),
+            RetrievalRelevance(),
+        ],
     )
     comparison_path = args.output_dir / "comparison.yaml"
     comparison_ds.to_file(comparison_path)

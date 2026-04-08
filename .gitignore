@@ -16,3 +16,4 @@ qdrant_data/
 project-plan.md
 docs/phases/
 src/research_assistant/eval/datasets/*_schema.json
+eval_results/

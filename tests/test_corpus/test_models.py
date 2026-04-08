@@ -11,6 +11,7 @@ class TestDocument:
         meta = EdgarMetadata(
             source="edgar",
             ticker="AAPL",
+            company_name="Apple Inc.",
             filing_type="10-K",
             period="FY2024",
             section_name="",
@@ -31,6 +32,7 @@ class TestDocument:
         meta = EdgarMetadata(
             source="edgar",
             ticker="MSFT",
+            company_name="Microsoft Corporation",
             filing_type="10-K",
             period="FY2024",
             section_name="",
