@@ -118,11 +118,11 @@ class QueryFilterExtractor:
         if key in self._name_to_ticker:
             return self._name_to_ticker[key]
 
-        # Substring match: extracted key must appear in a mapping key, longest match wins
+        # Substring match (bidirectional), longest match wins to avoid short-string ambiguity
         best_match: str | None = None
         best_len = 0
         for name, ticker in self._name_to_ticker.items():
-            if key in name and len(name) > best_len:
+            if (key in name or name in key) and len(name) > best_len:
                 best_match = ticker
                 best_len = len(name)
         if best_match:
