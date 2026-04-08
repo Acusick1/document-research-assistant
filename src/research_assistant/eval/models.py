@@ -18,3 +18,4 @@ class EvalMetadata(BaseModel):
     company: str | None = None
     companies: list[str] | None = None
     metric: str | None = None
+    fiscal_year: str | None = None

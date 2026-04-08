@@ -14,11 +14,15 @@ from research_assistant.eval.evaluators.answer_contains import AnswerContains
 from research_assistant.eval.evaluators.context_precision import ContextPrecision
 from research_assistant.eval.evaluators.faithfulness import Faithfulness
 from research_assistant.eval.evaluators.numeric_match import NumericMatch
+from research_assistant.eval.evaluators.retrieval_relevance import RetrievalRelevance
 from research_assistant.eval.models import EvalInput, EvalMetadata, EvalOutput
 
 type TaskFn = Callable[[EvalInput], Awaitable[EvalOutput]]
 
-CUSTOM_EVALUATORS = (AnswerContains, NumericMatch, ContextPrecision, Faithfulness)
+CUSTOM_EVALUATORS = (
+    AnswerContains, NumericMatch, ContextPrecision,
+    Faithfulness, RetrievalRelevance,
+)
 
 
 def _configure_judge_model() -> None:
