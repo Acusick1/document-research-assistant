@@ -36,6 +36,7 @@ class Settings(BaseSettings):
     cache_dir: Path = Path(".cache/edgar")
 
     datasets_dir: Path = _DEFAULT_DATASETS_DIR
+    eval_results_dir: Path = Path("eval_results")
 
     logfire_token: SecretStr | None = None
     log_level: str = "INFO"
