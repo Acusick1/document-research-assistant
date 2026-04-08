@@ -9,6 +9,7 @@ from diskcache import Cache
 class FilingCacheEntry(TypedDict):
     sections: dict[str, str]
     filing_date: str
+    company_name: str
 
 
 class FactsCacheEntry(TypedDict):

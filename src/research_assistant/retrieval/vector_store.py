@@ -5,10 +5,12 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict
 from qdrant_client import QdrantClient
+from qdrant_client.http.models import FacetValueHit
 from qdrant_client.models import (
     Distance,
     FieldCondition,
     Filter,
+    MatchAny,
     MatchValue,
     PointStruct,
     VectorParams,
@@ -27,6 +29,7 @@ class ChunkPayload(BaseModel):
     section_name: str
     chunk_index: int
     ticker: str
+    company_name: str
     period: str
     filing_type: str
     source: str
@@ -102,9 +105,13 @@ class QdrantStore:
     ) -> list[SearchResult]:
         qdrant_filter = None
         if filters:
-            qdrant_filter = Filter(
-                must=[FieldCondition(key=k, match=MatchValue(value=v)) for k, v in filters.items()]
-            )
+            conditions = []
+            for k, v in filters.items():
+                if isinstance(v, list):
+                    conditions.append(FieldCondition(key=k, match=MatchAny(any=v)))
+                else:
+                    conditions.append(FieldCondition(key=k, match=MatchValue(value=v)))
+            qdrant_filter = Filter(must=conditions)
 
         results = self.client.query_points(
             collection_name=self.collection_name,
@@ -118,6 +125,14 @@ class QdrantStore:
             for point in results.points
             if point.payload
         ]
+
+    def get_field_values(self, field: str, limit: int = 100) -> list[FacetValueHit]:
+        response = self.client.facet(
+            collection_name=self.collection_name,
+            key=field,
+            limit=limit,
+        )
+        return response.hits
 
     def count(self) -> int:
         info = self.client.get_collection(self.collection_name)

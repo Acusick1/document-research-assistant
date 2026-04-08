@@ -34,16 +34,21 @@ class EdgarParser:
                 logger.info("Cache hit for %s FY%d", ticker, year)
                 return self._build_document(ticker, year, cached)
 
-        sections, filing_date = self._fetch_filing(ticker, year)
-        entry = FilingCacheEntry(sections=sections, filing_date=filing_date.isoformat())
+        sections, filing_date, company_name = self._fetch_filing(ticker, year)
+        entry = FilingCacheEntry(
+            sections=sections,
+            filing_date=filing_date.isoformat(),
+            company_name=company_name,
+        )
 
         if self._cache is not None:
             self._cache.set(key, entry)
 
         return self._build_document(ticker, year, entry)
 
-    def _fetch_filing(self, ticker: str, year: int) -> tuple[dict[str, str], date]:
+    def _fetch_filing(self, ticker: str, year: int) -> tuple[dict[str, str], date, str]:
         company = Company(ticker)
+        company_name = company.name
         filings = company.get_filings(form="10-K")
 
         filing = self._find_filing_for_year(filings, year)
@@ -63,15 +68,17 @@ class EdgarParser:
                 continue
 
         filing_date = date.fromisoformat(str(filing.filing_date))
-        return sections, filing_date
+        return sections, filing_date, company_name
 
     def _build_document(self, ticker: str, year: int, data: FilingCacheEntry) -> Document:
         sections = data["sections"]
         filing_date = date.fromisoformat(data["filing_date"])
+        company_name = data.get("company_name", "")
 
         metadata = EdgarMetadata(
             source="edgar",
             ticker=ticker.upper(),
+            company_name=company_name,
             filing_type="10-K",
             period=f"FY{year}",
             section_name="",

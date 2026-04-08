@@ -34,6 +34,7 @@ def chunks() -> list[Chunk]:
     meta = EdgarMetadata(
         source="edgar",
         ticker="AAPL",
+        company_name="Apple Inc.",
         filing_type="10-K",
         period="FY2024",
         section_name="Item 1",

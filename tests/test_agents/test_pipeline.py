@@ -27,6 +27,7 @@ def _result(**overrides: object) -> SearchResult:
         "section_name": "Item 7",
         "chunk_index": 0,
         "ticker": "AAPL",
+        "company_name": "Apple Inc.",
         "period": "FY2024",
         "filing_type": "10-K",
         "source": "edgar",
@@ -88,6 +89,7 @@ class TestRagPipeline:
         meta = EdgarMetadata(
             source="edgar",
             ticker="AAPL",
+            company_name="Apple Inc.",
             filing_type="10-K",
             period="FY2024",
             section_name="Item 7",

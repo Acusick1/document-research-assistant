@@ -41,6 +41,8 @@ class Settings(BaseSettings):
     logfire_token: SecretStr | None = None
     log_level: str = "INFO"
 
+    filter_model: str = "anthropic:claude-haiku-4-5-20251001"
+
     eval_judge_model: str = "openai:gpt-5.4-nano"
     openai_api_key: SecretStr | None = None
 

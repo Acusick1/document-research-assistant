@@ -24,6 +24,7 @@ def sample_chunks_with_vectors() -> tuple[list[Chunk], list[list[float]]]:
     meta = EdgarMetadata(
         source="edgar",
         ticker="AAPL",
+        company_name="Apple Inc.",
         filing_type="10-K",
         period="FY2024",
         section_name="Item 1",
