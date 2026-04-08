@@ -4,16 +4,19 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
+from dotenv import load_dotenv
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+load_dotenv()
 
 _DEFAULT_DATASETS_DIR = Path(__file__).parent / "eval" / "datasets"
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix="RA_", env_file=".env")
+    model_config = SettingsConfigDict(env_file=".env")
 
-    llm_model: str = "anthropic:claude-sonnet-4-6"
+    llm_model: str = "anthropic:claude-haiku-4-5-20251001"
     anthropic_api_key: SecretStr | None = None
 
     embedding_model: str = "BAAI/bge-small-en-v1.5"
@@ -27,7 +30,8 @@ class Settings(BaseSettings):
 
     chunk_max_tokens: int = 512
 
-    top_k: int = 5
+    top_k: int = 3
+    max_tokens: int = 512
 
     cache_dir: Path = Path(".cache/edgar")
 
@@ -36,7 +40,7 @@ class Settings(BaseSettings):
     logfire_token: SecretStr | None = None
     log_level: str = "INFO"
 
-    eval_judge_model: str = "openai:gpt-4o-mini"
+    eval_judge_model: str = "openai:gpt-5.4-nano"
     openai_api_key: SecretStr | None = None
 
 
@@ -47,7 +51,7 @@ def get_settings() -> Settings:
 
 def configure_logfire(settings: Settings | None = None) -> None:
     settings = settings or get_settings()
-    if settings.logfire_token is None:
+    if not settings.logfire_token:
         return
     import logfire
 

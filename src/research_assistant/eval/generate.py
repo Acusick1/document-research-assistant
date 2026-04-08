@@ -8,6 +8,8 @@ from edgar import Company, set_identity
 from pydantic_evals import Case
 
 from research_assistant.corpus.edgar.cache import EdgarCache, FactsCacheEntry, facts_key
+from research_assistant.eval.evaluators.answer_contains import AnswerContains
+from research_assistant.eval.evaluators.context_precision import ContextPrecision
 from research_assistant.eval.evaluators.numeric_match import NumericMatch
 from research_assistant.eval.models import EvalInput, EvalMetadata, EvalOutput
 
@@ -125,6 +127,7 @@ def generate_factual_cases(
     identity: str = "ResearchAssistant research@example.com",
     min_year: int = 2022,
     cache: EdgarCache | None = None,
+    max_years: int = 1,
 ) -> list[Case[EvalInput, EvalOutput, EvalMetadata]]:
     set_identity(identity)
     cases: list[Case[EvalInput, EvalOutput, EvalMetadata]] = []
@@ -142,7 +145,8 @@ def generate_factual_cases(
                 logger.debug("No annual data for %s/%s", ticker, concept)
                 continue
 
-            for fy, value in annual.items():
+            latest_years = dict(sorted(annual.items(), reverse=True)[:max_years])
+            for fy, value in latest_years.items():
                 case = Case(
                     name=f"{ticker.lower()}_{concept}_{fy.lower()}",
                     inputs=EvalInput(
@@ -204,7 +208,9 @@ def _log_coverage(
 def generate_comparison_cases(
     tickers: list[str],
     identity: str = "ResearchAssistant research@example.com",
+    min_year: int = 2022,
     cache: EdgarCache | None = None,
+    max_pairs_per_concept: int = 2,
 ) -> list[Case[EvalInput, EvalOutput, EvalMetadata]]:
     set_identity(identity)
 
@@ -219,7 +225,7 @@ def generate_comparison_cases(
 
         values: dict[str, tuple[float, str, str]] = {}
         for concept, _ in FACTUAL_CONCEPTS:
-            annual = _get_annual_values(facts_df, concept)
+            annual = _get_annual_values(facts_df, concept, min_year=min_year)
             if annual:
                 latest_fy = max(annual.keys())
                 values[concept] = (annual[latest_fy], name, latest_fy)
@@ -228,36 +234,44 @@ def generate_comparison_cases(
     cases: list[Case[EvalInput, EvalOutput, EvalMetadata]] = []
     ticker_list = list(company_values.keys())
 
-    for i in range(len(ticker_list)):
-        for j in range(i + 1, len(ticker_list)):
-            t1, t2 = ticker_list[i], ticker_list[j]
+    all_pairs = [
+        (ticker_list[i], ticker_list[j])
+        for i in range(len(ticker_list))
+        for j in range(i + 1, len(ticker_list))
+    ]
+
+    for concept, label in FACTUAL_CONCEPTS:
+        pairs_used = 0
+        for t1, t2 in all_pairs:
+            if pairs_used >= max_pairs_per_concept:
+                break
             v1, v2 = company_values[t1], company_values[t2]
+            if concept not in v1 or concept not in v2:
+                continue
 
-            for concept, label in FACTUAL_CONCEPTS[:5]:
-                if concept not in v1 or concept not in v2:
-                    continue
+            val1, name1, fy1 = v1[concept]
+            val2, name2, fy2 = v2[concept]
 
-                val1, name1, fy1 = v1[concept]
-                val2, name2, fy2 = v2[concept]
+            higher = name1 if val1 > val2 else name2
+            higher_ticker = t1 if val1 > val2 else t2
 
-                higher = name1 if val1 > val2 else name2
-                higher_ticker = t1 if val1 > val2 else t2
-
-                case = Case(
-                    name=f"{t1.lower()}_vs_{t2.lower()}_{concept}",
-                    inputs=EvalInput(
-                        query=(
-                            f"Which company had higher {label}, {name1} ({fy1}) or {name2} ({fy2})?"
-                        ),
+            case = Case(
+                name=f"{t1.lower()}_vs_{t2.lower()}_{concept}",
+                inputs=EvalInput(
+                    query=(
+                        f"Which company had higher {label}, {name1} ({fy1}) or {name2} ({fy2})?"
                     ),
-                    expected_output=EvalOutput(answer=higher),
-                    metadata=EvalMetadata(
-                        category="comparison",
-                        companies=[t1, t2],
-                        company=higher_ticker,
-                        metric=concept,
-                    ),
-                )
-                cases.append(case)
+                ),
+                expected_output=EvalOutput(answer=higher),
+                metadata=EvalMetadata(
+                    category="comparison",
+                    companies=[t1, t2],
+                    company=higher_ticker,
+                    metric=concept,
+                ),
+                evaluators=(AnswerContains(), ContextPrecision()),
+            )
+            cases.append(case)
+            pairs_used += 1
 
     return cases

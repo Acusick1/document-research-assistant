@@ -1,38 +1,6 @@
 # yaml-language-server: $schema=comparison_schema.json
 name: comparison
 cases:
-- name: aapl_vs_msft_net_income
-  inputs:
-    query: Which company had higher net income, Apple Inc. (FY2025) or MICROSOFT CORP
-      (FY2025)?
-  metadata:
-    category: comparison
-    company: AAPL
-    companies:
-    - AAPL
-    - MSFT
-    metric: net_income
-  expected_output:
-    answer: Apple Inc.
-    numeric_answer: null
-    sources: []
-  evaluators: null
-- name: aapl_vs_msft_operating_income
-  inputs:
-    query: Which company had higher operating income, Apple Inc. (FY2025) or MICROSOFT
-      CORP (FY2025)?
-  metadata:
-    category: comparison
-    company: AAPL
-    companies:
-    - AAPL
-    - MSFT
-    metric: operating_income
-  expected_output:
-    answer: Apple Inc.
-    numeric_answer: null
-    sources: []
-  evaluators: null
 - name: aapl_vs_msft_revenue
   inputs:
     query: Which company had higher total revenue, Apple Inc. (FY2025) or MICROSOFT
@@ -48,7 +16,63 @@ cases:
     answer: Apple Inc.
     numeric_answer: null
     sources: []
-  evaluators: null
+  evaluators:
+  - AnswerContains
+  - ContextPrecision
+- name: aapl_vs_googl_revenue
+  inputs:
+    query: Which company had higher total revenue, Apple Inc. (FY2025) or Alphabet
+      Inc. (FY2025)?
+  metadata:
+    category: comparison
+    company: AAPL
+    companies:
+    - AAPL
+    - GOOGL
+    metric: revenue
+  expected_output:
+    answer: Apple Inc.
+    numeric_answer: null
+    sources: []
+  evaluators:
+  - AnswerContains
+  - ContextPrecision
+- name: aapl_vs_msft_net_income
+  inputs:
+    query: Which company had higher net income, Apple Inc. (FY2025) or MICROSOFT CORP
+      (FY2025)?
+  metadata:
+    category: comparison
+    company: AAPL
+    companies:
+    - AAPL
+    - MSFT
+    metric: net_income
+  expected_output:
+    answer: Apple Inc.
+    numeric_answer: null
+    sources: []
+  evaluators:
+  - AnswerContains
+  - ContextPrecision
+- name: aapl_vs_googl_net_income
+  inputs:
+    query: Which company had higher net income, Apple Inc. (FY2025) or Alphabet Inc.
+      (FY2025)?
+  metadata:
+    category: comparison
+    company: GOOGL
+    companies:
+    - AAPL
+    - GOOGL
+    metric: net_income
+  expected_output:
+    answer: Alphabet Inc.
+    numeric_answer: null
+    sources: []
+  evaluators:
+  - AnswerContains
+  - ContextPrecision
 - name: aapl_vs_msft_total_assets
   inputs:
     query: Which company had higher total assets, Apple Inc. (FY2025) or MICROSOFT
@@ -64,7 +88,27 @@ cases:
     answer: MICROSOFT CORP
     numeric_answer: null
     sources: []
-  evaluators: null
+  evaluators:
+  - AnswerContains
+  - ContextPrecision
+- name: aapl_vs_googl_total_assets
+  inputs:
+    query: Which company had higher total assets, Apple Inc. (FY2025) or Alphabet
+      Inc. (FY2025)?
+  metadata:
+    category: comparison
+    company: GOOGL
+    companies:
+    - AAPL
+    - GOOGL
+    metric: total_assets
+  expected_output:
+    answer: Alphabet Inc.
+    numeric_answer: null
+    sources: []
+  evaluators:
+  - AnswerContains
+  - ContextPrecision
 - name: aapl_vs_msft_total_liabilities
   inputs:
     query: Which company had higher total liabilities, Apple Inc. (FY2025) or MICROSOFT
@@ -80,240 +124,242 @@ cases:
     answer: Apple Inc.
     numeric_answer: null
     sources: []
-  evaluators: null
-- name: aapl_vs_nvda_net_income
+  evaluators:
+  - AnswerContains
+  - ContextPrecision
+- name: aapl_vs_googl_total_liabilities
   inputs:
-    query: Which company had higher net income, Apple Inc. (FY2025) or NVIDIA CORP
-      (FY2026)?
-  metadata:
-    category: comparison
-    company: NVDA
-    companies:
-    - AAPL
-    - NVDA
-    metric: net_income
-  expected_output:
-    answer: NVIDIA CORP
-    numeric_answer: null
-    sources: []
-  evaluators: null
-- name: aapl_vs_nvda_operating_income
-  inputs:
-    query: Which company had higher operating income, Apple Inc. (FY2025) or NVIDIA
-      CORP (FY2026)?
+    query: Which company had higher total liabilities, Apple Inc. (FY2025) or Alphabet
+      Inc. (FY2025)?
   metadata:
     category: comparison
     company: AAPL
     companies:
     - AAPL
-    - NVDA
-    metric: operating_income
-  expected_output:
-    answer: Apple Inc.
-    numeric_answer: null
-    sources: []
-  evaluators: null
-- name: aapl_vs_nvda_revenue
-  inputs:
-    query: Which company had higher total revenue, Apple Inc. (FY2025) or NVIDIA CORP
-      (FY2026)?
-  metadata:
-    category: comparison
-    company: AAPL
-    companies:
-    - AAPL
-    - NVDA
-    metric: revenue
-  expected_output:
-    answer: Apple Inc.
-    numeric_answer: null
-    sources: []
-  evaluators: null
-- name: aapl_vs_nvda_total_assets
-  inputs:
-    query: Which company had higher total assets, Apple Inc. (FY2025) or NVIDIA CORP
-      (FY2026)?
-  metadata:
-    category: comparison
-    company: AAPL
-    companies:
-    - AAPL
-    - NVDA
-    metric: total_assets
-  expected_output:
-    answer: Apple Inc.
-    numeric_answer: null
-    sources: []
-  evaluators: null
-- name: aapl_vs_nvda_total_liabilities
-  inputs:
-    query: Which company had higher total liabilities, Apple Inc. (FY2025) or NVIDIA
-      CORP (FY2026)?
-  metadata:
-    category: comparison
-    company: AAPL
-    companies:
-    - AAPL
-    - NVDA
+    - GOOGL
     metric: total_liabilities
   expected_output:
     answer: Apple Inc.
     numeric_answer: null
     sources: []
-  evaluators: null
-- name: googl_vs_amzn_net_income
+  evaluators:
+  - AnswerContains
+  - ContextPrecision
+- name: aapl_vs_msft_operating_income
   inputs:
-    query: Which company had higher net income, Alphabet Inc. (FY2025) or AMAZON COM
-      INC (FY2025)?
+    query: Which company had higher operating income, Apple Inc. (FY2025) or MICROSOFT
+      CORP (FY2025)?
+  metadata:
+    category: comparison
+    company: AAPL
+    companies:
+    - AAPL
+    - MSFT
+    metric: operating_income
+  expected_output:
+    answer: Apple Inc.
+    numeric_answer: null
+    sources: []
+  evaluators:
+  - AnswerContains
+  - ContextPrecision
+- name: aapl_vs_googl_operating_income
+  inputs:
+    query: Which company had higher operating income, Apple Inc. (FY2025) or Alphabet
+      Inc. (FY2025)?
+  metadata:
+    category: comparison
+    company: AAPL
+    companies:
+    - AAPL
+    - GOOGL
+    metric: operating_income
+  expected_output:
+    answer: Apple Inc.
+    numeric_answer: null
+    sources: []
+  evaluators:
+  - AnswerContains
+  - ContextPrecision
+- name: aapl_vs_msft_cost_of_revenue
+  inputs:
+    query: Which company had higher cost of revenue, Apple Inc. (FY2025) or MICROSOFT
+      CORP (FY2025)?
+  metadata:
+    category: comparison
+    company: AAPL
+    companies:
+    - AAPL
+    - MSFT
+    metric: cost_of_revenue
+  expected_output:
+    answer: Apple Inc.
+    numeric_answer: null
+    sources: []
+  evaluators:
+  - AnswerContains
+  - ContextPrecision
+- name: aapl_vs_googl_cost_of_revenue
+  inputs:
+    query: Which company had higher cost of revenue, Apple Inc. (FY2025) or Alphabet
+      Inc. (FY2025)?
+  metadata:
+    category: comparison
+    company: AAPL
+    companies:
+    - AAPL
+    - GOOGL
+    metric: cost_of_revenue
+  expected_output:
+    answer: Apple Inc.
+    numeric_answer: null
+    sources: []
+  evaluators:
+  - AnswerContains
+  - ContextPrecision
+- name: aapl_vs_msft_gross_profit
+  inputs:
+    query: Which company had higher gross profit, Apple Inc. (FY2025) or MICROSOFT
+      CORP (FY2025)?
+  metadata:
+    category: comparison
+    company: AAPL
+    companies:
+    - AAPL
+    - MSFT
+    metric: gross_profit
+  expected_output:
+    answer: Apple Inc.
+    numeric_answer: null
+    sources: []
+  evaluators:
+  - AnswerContains
+  - ContextPrecision
+- name: aapl_vs_nvda_gross_profit
+  inputs:
+    query: Which company had higher gross profit, Apple Inc. (FY2025) or NVIDIA CORP
+      (FY2026)?
+  metadata:
+    category: comparison
+    company: AAPL
+    companies:
+    - AAPL
+    - NVDA
+    metric: gross_profit
+  expected_output:
+    answer: Apple Inc.
+    numeric_answer: null
+    sources: []
+  evaluators:
+  - AnswerContains
+  - ContextPrecision
+- name: aapl_vs_msft_research_and_development
+  inputs:
+    query: Which company had higher R&D spending, Apple Inc. (FY2025) or MICROSOFT
+      CORP (FY2025)?
+  metadata:
+    category: comparison
+    company: AAPL
+    companies:
+    - AAPL
+    - MSFT
+    metric: research_and_development
+  expected_output:
+    answer: Apple Inc.
+    numeric_answer: null
+    sources: []
+  evaluators:
+  - AnswerContains
+  - ContextPrecision
+- name: aapl_vs_googl_research_and_development
+  inputs:
+    query: Which company had higher R&D spending, Apple Inc. (FY2025) or Alphabet
+      Inc. (FY2025)?
   metadata:
     category: comparison
     company: GOOGL
     companies:
+    - AAPL
     - GOOGL
-    - AMZN
-    metric: net_income
+    metric: research_and_development
   expected_output:
     answer: Alphabet Inc.
     numeric_answer: null
     sources: []
-  evaluators: null
-- name: googl_vs_amzn_operating_income
+  evaluators:
+  - AnswerContains
+  - ContextPrecision
+- name: aapl_vs_msft_stockholders_equity
   inputs:
-    query: Which company had higher operating income, Alphabet Inc. (FY2025) or AMAZON
-      COM INC (FY2025)?
+    query: Which company had higher stockholders' equity, Apple Inc. (FY2025) or MICROSOFT
+      CORP (FY2025)?
+  metadata:
+    category: comparison
+    company: MSFT
+    companies:
+    - AAPL
+    - MSFT
+    metric: stockholders_equity
+  expected_output:
+    answer: MICROSOFT CORP
+    numeric_answer: null
+    sources: []
+  evaluators:
+  - AnswerContains
+  - ContextPrecision
+- name: aapl_vs_googl_stockholders_equity
+  inputs:
+    query: Which company had higher stockholders' equity, Apple Inc. (FY2025) or Alphabet
+      Inc. (FY2025)?
   metadata:
     category: comparison
     company: GOOGL
     companies:
+    - AAPL
     - GOOGL
-    - AMZN
-    metric: operating_income
+    metric: stockholders_equity
   expected_output:
     answer: Alphabet Inc.
     numeric_answer: null
     sources: []
-  evaluators: null
-- name: googl_vs_amzn_revenue
+  evaluators:
+  - AnswerContains
+  - ContextPrecision
+- name: aapl_vs_msft_operating_cash_flow
   inputs:
-    query: Which company had higher total revenue, Alphabet Inc. (FY2025) or AMAZON
-      COM INC (FY2025)?
+    query: Which company had higher operating cash flow, Apple Inc. (FY2025) or MICROSOFT
+      CORP (FY2025)?
   metadata:
     category: comparison
-    company: AMZN
+    company: MSFT
     companies:
+    - AAPL
+    - MSFT
+    metric: operating_cash_flow
+  expected_output:
+    answer: MICROSOFT CORP
+    numeric_answer: null
+    sources: []
+  evaluators:
+  - AnswerContains
+  - ContextPrecision
+- name: aapl_vs_googl_operating_cash_flow
+  inputs:
+    query: Which company had higher operating cash flow, Apple Inc. (FY2025) or Alphabet
+      Inc. (FY2025)?
+  metadata:
+    category: comparison
+    company: GOOGL
+    companies:
+    - AAPL
     - GOOGL
-    - AMZN
-    metric: revenue
+    metric: operating_cash_flow
   expected_output:
-    answer: AMAZON COM INC
+    answer: Alphabet Inc.
     numeric_answer: null
     sources: []
-  evaluators: null
-- name: googl_vs_amzn_total_assets
-  inputs:
-    query: Which company had higher total assets, Alphabet Inc. (FY2025) or AMAZON
-      COM INC (FY2025)?
-  metadata:
-    category: comparison
-    company: AMZN
-    companies:
-    - GOOGL
-    - AMZN
-    metric: total_assets
-  expected_output:
-    answer: AMAZON COM INC
-    numeric_answer: null
-    sources: []
-  evaluators: null
-- name: meta_vs_nvda_net_income
-  inputs:
-    query: Which company had higher net income, Meta Platforms, Inc. (FY2025) or NVIDIA
-      CORP (FY2026)?
-  metadata:
-    category: comparison
-    company: NVDA
-    companies:
-    - META
-    - NVDA
-    metric: net_income
-  expected_output:
-    answer: NVIDIA CORP
-    numeric_answer: null
-    sources: []
-  evaluators: null
-- name: meta_vs_nvda_operating_income
-  inputs:
-    query: Which company had higher operating income, Meta Platforms, Inc. (FY2025)
-      or NVIDIA CORP (FY2026)?
-  metadata:
-    category: comparison
-    company: NVDA
-    companies:
-    - META
-    - NVDA
-    metric: operating_income
-  expected_output:
-    answer: NVIDIA CORP
-    numeric_answer: null
-    sources: []
-  evaluators: null
-- name: meta_vs_nvda_revenue
-  inputs:
-    query: Which company had higher total revenue, Meta Platforms, Inc. (FY2025) or
-      NVIDIA CORP (FY2026)?
-  metadata:
-    category: comparison
-    company: NVDA
-    companies:
-    - META
-    - NVDA
-    metric: revenue
-  expected_output:
-    answer: NVIDIA CORP
-    numeric_answer: null
-    sources: []
-  evaluators: null
-- name: meta_vs_nvda_total_assets
-  inputs:
-    query: Which company had higher total assets, Meta Platforms, Inc. (FY2025) or
-      NVIDIA CORP (FY2026)?
-  metadata:
-    category: comparison
-    company: META
-    companies:
-    - META
-    - NVDA
-    metric: total_assets
-  expected_output:
-    answer: Meta Platforms, Inc.
-    numeric_answer: null
-    sources: []
-  evaluators: null
-- name: meta_vs_nvda_total_liabilities
-  inputs:
-    query: Which company had higher total liabilities, Meta Platforms, Inc. (FY2025)
-      or NVIDIA CORP (FY2026)?
-  metadata:
-    category: comparison
-    company: META
-    companies:
-    - META
-    - NVDA
-    metric: total_liabilities
-  expected_output:
-    answer: Meta Platforms, Inc.
-    numeric_answer: null
-    sources: []
-  evaluators: null
-evaluators:
-- LLMJudge:
-    rubric: >-
-      The output should correctly identify which company had the higher value for
-      the metric in question. Compare the company name in the output against the
-      expected output. The output is correct if it names the same company as the
-      expected output (the company name or ticker may differ in formatting). Ignore
-      differences in explanation detail or phrasing.
-    include_input: true
-    include_expected_output: true
-- ContextPrecision: {}
+  evaluators:
+  - AnswerContains
+  - ContextPrecision
+evaluators: []
 report_evaluators: []

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import logging
 
+from pydantic_ai.settings import ModelSettings
+
 from research_assistant.agents.simple import create_agent
 from research_assistant.config import Settings, get_settings
 from research_assistant.eval.models import EvalInput, EvalOutput
@@ -37,6 +39,7 @@ class RagPipeline:
         self._store = QdrantStore(client, settings.collection_name, self._embedder.dim)
         self._agent = create_agent(model=settings.llm_model)
         self._top_k = settings.top_k
+        self._max_tokens = settings.max_tokens
 
     async def __call__(self, eval_input: EvalInput) -> EvalOutput:
         query_vector = self._embedder.embed([eval_input.query])[0].tolist()
@@ -48,7 +51,9 @@ class RagPipeline:
         prompt = f"Question: {eval_input.query}\n\nRetrieved Context:\n{context}"
         logger.debug("RAG prompt (%d retrieved chunks):\n%s", len(results), prompt[:500])
 
-        response = await self._agent.run(prompt)
+        response = await self._agent.run(
+            prompt, model_settings=ModelSettings(max_tokens=self._max_tokens),
+        )
         output = response.output
 
         return EvalOutput(
