@@ -45,7 +45,7 @@ async def run_eval(
     dataset_path: Path,
     task: TaskFn,
     task_name: str = "RagPipeline",
-    max_concurrency: int = 2,
+    max_concurrency: int = 1,
     max_cases: int | None = None,
     experiment_name: str | None = None,
     metadata: dict[str, Any] | None = None,
@@ -71,7 +71,7 @@ async def run_all_evals(
     datasets_dir: Path | None = None,
     dataset_name: str | None = None,
     max_cases: int | None = None,
-    max_concurrency: int = 2,
+    max_concurrency: int = 1,
     experiment_name: str | None = None,
 ) -> dict[str, EvaluationReport[EvalInput, EvalOutput, EvalMetadata]]:
     settings = get_settings()

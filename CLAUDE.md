@@ -27,7 +27,7 @@ These are deliberate decisions — do not change without discussion.
 - **Agent framework**: Pydantic AI directly. No orchestration protocol layer (QueryEngine/Retriever protocols were deliberately dropped). If a LangGraph comparison happens later, extract protocols then.
 - **Graph API**: pydantic-graph class-based API (`BaseNode` subclasses). Not the beta builder API.
 - **LLM (generation)**: `anthropic:claude-haiku-4-5-20251001`
-- **LLM (eval judge)**: ideally a different model family from generation to avoid systematic bias. Default: `openai:gpt-4o-mini`.
+- **LLM (eval judge)**: ideally a different model family from generation to avoid systematic bias. Default: `openai:gpt-5.4-nano`.
 - **Evals**: `pydantic-evals`. RAGAS metrics implemented as custom evaluators within pydantic-evals, not as a separate framework.
 - **Observability**: Logfire. `logfire.instrument_pydantic_ai()` for agent tracing.
 - **Testing**: pytest with class-based tests. Shared fixtures in conftest.py. Qdrant in-memory mode for tests.
