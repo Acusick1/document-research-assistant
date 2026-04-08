@@ -1,20 +1,6 @@
 # yaml-language-server: $schema=factual_schema.json
 name: factual
 cases:
-- name: aapl_revenue_fy2024
-  inputs:
-    query: What was Apple Inc.'s total revenue in FY2024?
-  metadata:
-    category: factual
-    company: AAPL
-    companies: null
-    metric: revenue
-  expected_output:
-    answer: '391035000000.0'
-    numeric_answer: 391035000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
 - name: aapl_revenue_fy2025
   inputs:
     query: What was Apple Inc.'s total revenue in FY2025?
@@ -26,20 +12,6 @@ cases:
   expected_output:
     answer: '416161000000.0'
     numeric_answer: 416161000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: aapl_net_income_fy2024
-  inputs:
-    query: What was Apple Inc.'s net income in FY2024?
-  metadata:
-    category: factual
-    company: AAPL
-    companies: null
-    metric: net_income
-  expected_output:
-    answer: '93736000000.0'
-    numeric_answer: 93736000000.0
     sources: []
   evaluators:
   - NumericMatch: 0.05
@@ -57,20 +29,6 @@ cases:
     sources: []
   evaluators:
   - NumericMatch: 0.05
-- name: aapl_total_assets_fy2024
-  inputs:
-    query: What was Apple Inc.'s total assets in FY2024?
-  metadata:
-    category: factual
-    company: AAPL
-    companies: null
-    metric: total_assets
-  expected_output:
-    answer: '364980000000.0'
-    numeric_answer: 364980000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
 - name: aapl_total_assets_fy2025
   inputs:
     query: What was Apple Inc.'s total assets in FY2025?
@@ -82,20 +40,6 @@ cases:
   expected_output:
     answer: '359241000000.0'
     numeric_answer: 359241000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: aapl_total_liabilities_fy2024
-  inputs:
-    query: What was Apple Inc.'s total liabilities in FY2024?
-  metadata:
-    category: factual
-    company: AAPL
-    companies: null
-    metric: total_liabilities
-  expected_output:
-    answer: '308030000000.0'
-    numeric_answer: 308030000000.0
     sources: []
   evaluators:
   - NumericMatch: 0.05
@@ -113,20 +57,6 @@ cases:
     sources: []
   evaluators:
   - NumericMatch: 0.05
-- name: aapl_operating_income_fy2024
-  inputs:
-    query: What was Apple Inc.'s operating income in FY2024?
-  metadata:
-    category: factual
-    company: AAPL
-    companies: null
-    metric: operating_income
-  expected_output:
-    answer: '123216000000.0'
-    numeric_answer: 123216000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
 - name: aapl_operating_income_fy2025
   inputs:
     query: What was Apple Inc.'s operating income in FY2025?
@@ -138,20 +68,6 @@ cases:
   expected_output:
     answer: '133050000000.0'
     numeric_answer: 133050000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: aapl_cost_of_revenue_fy2024
-  inputs:
-    query: What was Apple Inc.'s cost of revenue in FY2024?
-  metadata:
-    category: factual
-    company: AAPL
-    companies: null
-    metric: cost_of_revenue
-  expected_output:
-    answer: '210352000000.0'
-    numeric_answer: 210352000000.0
     sources: []
   evaluators:
   - NumericMatch: 0.05
@@ -169,20 +85,6 @@ cases:
     sources: []
   evaluators:
   - NumericMatch: 0.05
-- name: aapl_gross_profit_fy2024
-  inputs:
-    query: What was Apple Inc.'s gross profit in FY2024?
-  metadata:
-    category: factual
-    company: AAPL
-    companies: null
-    metric: gross_profit
-  expected_output:
-    answer: '180683000000.0'
-    numeric_answer: 180683000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
 - name: aapl_gross_profit_fy2025
   inputs:
     query: What was Apple Inc.'s gross profit in FY2025?
@@ -194,20 +96,6 @@ cases:
   expected_output:
     answer: '195201000000.0'
     numeric_answer: 195201000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: aapl_research_and_development_fy2024
-  inputs:
-    query: What was Apple Inc.'s R&D spending in FY2024?
-  metadata:
-    category: factual
-    company: AAPL
-    companies: null
-    metric: research_and_development
-  expected_output:
-    answer: '31370000000.0'
-    numeric_answer: 31370000000.0
     sources: []
   evaluators:
   - NumericMatch: 0.05
@@ -225,20 +113,6 @@ cases:
     sources: []
   evaluators:
   - NumericMatch: 0.05
-- name: aapl_stockholders_equity_fy2024
-  inputs:
-    query: What was Apple Inc.'s stockholders' equity in FY2024?
-  metadata:
-    category: factual
-    company: AAPL
-    companies: null
-    metric: stockholders_equity
-  expected_output:
-    answer: '56950000000.0'
-    numeric_answer: 56950000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
 - name: aapl_stockholders_equity_fy2025
   inputs:
     query: What was Apple Inc.'s stockholders' equity in FY2025?
@@ -250,20 +124,6 @@ cases:
   expected_output:
     answer: '73733000000.0'
     numeric_answer: 73733000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: aapl_operating_cash_flow_fy2024
-  inputs:
-    query: What was Apple Inc.'s operating cash flow in FY2024?
-  metadata:
-    category: factual
-    company: AAPL
-    companies: null
-    metric: operating_cash_flow
-  expected_output:
-    answer: '118254000000.0'
-    numeric_answer: 118254000000.0
     sources: []
   evaluators:
   - NumericMatch: 0.05
@@ -281,20 +141,6 @@ cases:
     sources: []
   evaluators:
   - NumericMatch: 0.05
-- name: msft_revenue_fy2024
-  inputs:
-    query: What was MICROSOFT CORP's total revenue in FY2024?
-  metadata:
-    category: factual
-    company: MSFT
-    companies: null
-    metric: revenue
-  expected_output:
-    answer: '245122000000.0'
-    numeric_answer: 245122000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
 - name: msft_revenue_fy2025
   inputs:
     query: What was MICROSOFT CORP's total revenue in FY2025?
@@ -306,20 +152,6 @@ cases:
   expected_output:
     answer: '281724000000.0'
     numeric_answer: 281724000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: msft_net_income_fy2024
-  inputs:
-    query: What was MICROSOFT CORP's net income in FY2024?
-  metadata:
-    category: factual
-    company: MSFT
-    companies: null
-    metric: net_income
-  expected_output:
-    answer: '88136000000.0'
-    numeric_answer: 88136000000.0
     sources: []
   evaluators:
   - NumericMatch: 0.05
@@ -337,20 +169,6 @@ cases:
     sources: []
   evaluators:
   - NumericMatch: 0.05
-- name: msft_total_assets_fy2024
-  inputs:
-    query: What was MICROSOFT CORP's total assets in FY2024?
-  metadata:
-    category: factual
-    company: MSFT
-    companies: null
-    metric: total_assets
-  expected_output:
-    answer: '512163000000.0'
-    numeric_answer: 512163000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
 - name: msft_total_assets_fy2025
   inputs:
     query: What was MICROSOFT CORP's total assets in FY2025?
@@ -362,20 +180,6 @@ cases:
   expected_output:
     answer: '619003000000.0'
     numeric_answer: 619003000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: msft_total_liabilities_fy2024
-  inputs:
-    query: What was MICROSOFT CORP's total liabilities in FY2024?
-  metadata:
-    category: factual
-    company: MSFT
-    companies: null
-    metric: total_liabilities
-  expected_output:
-    answer: '243686000000.0'
-    numeric_answer: 243686000000.0
     sources: []
   evaluators:
   - NumericMatch: 0.05
@@ -393,20 +197,6 @@ cases:
     sources: []
   evaluators:
   - NumericMatch: 0.05
-- name: msft_operating_income_fy2024
-  inputs:
-    query: What was MICROSOFT CORP's operating income in FY2024?
-  metadata:
-    category: factual
-    company: MSFT
-    companies: null
-    metric: operating_income
-  expected_output:
-    answer: '109433000000.0'
-    numeric_answer: 109433000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
 - name: msft_operating_income_fy2025
   inputs:
     query: What was MICROSOFT CORP's operating income in FY2025?
@@ -418,20 +208,6 @@ cases:
   expected_output:
     answer: '128528000000.0'
     numeric_answer: 128528000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: msft_cost_of_revenue_fy2024
-  inputs:
-    query: What was MICROSOFT CORP's cost of revenue in FY2024?
-  metadata:
-    category: factual
-    company: MSFT
-    companies: null
-    metric: cost_of_revenue
-  expected_output:
-    answer: '74114000000.0'
-    numeric_answer: 74114000000.0
     sources: []
   evaluators:
   - NumericMatch: 0.05
@@ -449,20 +225,6 @@ cases:
     sources: []
   evaluators:
   - NumericMatch: 0.05
-- name: msft_gross_profit_fy2024
-  inputs:
-    query: What was MICROSOFT CORP's gross profit in FY2024?
-  metadata:
-    category: factual
-    company: MSFT
-    companies: null
-    metric: gross_profit
-  expected_output:
-    answer: '171008000000.0'
-    numeric_answer: 171008000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
 - name: msft_gross_profit_fy2025
   inputs:
     query: What was MICROSOFT CORP's gross profit in FY2025?
@@ -474,20 +236,6 @@ cases:
   expected_output:
     answer: '193893000000.0'
     numeric_answer: 193893000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: msft_research_and_development_fy2024
-  inputs:
-    query: What was MICROSOFT CORP's R&D spending in FY2024?
-  metadata:
-    category: factual
-    company: MSFT
-    companies: null
-    metric: research_and_development
-  expected_output:
-    answer: '29510000000.0'
-    numeric_answer: 29510000000.0
     sources: []
   evaluators:
   - NumericMatch: 0.05
@@ -505,20 +253,6 @@ cases:
     sources: []
   evaluators:
   - NumericMatch: 0.05
-- name: msft_stockholders_equity_fy2024
-  inputs:
-    query: What was MICROSOFT CORP's stockholders' equity in FY2024?
-  metadata:
-    category: factual
-    company: MSFT
-    companies: null
-    metric: stockholders_equity
-  expected_output:
-    answer: '268477000000.0'
-    numeric_answer: 268477000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
 - name: msft_stockholders_equity_fy2025
   inputs:
     query: What was MICROSOFT CORP's stockholders' equity in FY2025?
@@ -530,20 +264,6 @@ cases:
   expected_output:
     answer: '343479000000.0'
     numeric_answer: 343479000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: msft_operating_cash_flow_fy2024
-  inputs:
-    query: What was MICROSOFT CORP's operating cash flow in FY2024?
-  metadata:
-    category: factual
-    company: MSFT
-    companies: null
-    metric: operating_cash_flow
-  expected_output:
-    answer: '118548000000.0'
-    numeric_answer: 118548000000.0
     sources: []
   evaluators:
   - NumericMatch: 0.05
@@ -561,20 +281,6 @@ cases:
     sources: []
   evaluators:
   - NumericMatch: 0.05
-- name: googl_revenue_fy2024
-  inputs:
-    query: What was Alphabet Inc.'s total revenue in FY2024?
-  metadata:
-    category: factual
-    company: GOOGL
-    companies: null
-    metric: revenue
-  expected_output:
-    answer: '350018000000.0'
-    numeric_answer: 350018000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
 - name: googl_revenue_fy2025
   inputs:
     query: What was Alphabet Inc.'s total revenue in FY2025?
@@ -586,20 +292,6 @@ cases:
   expected_output:
     answer: '402836000000.0'
     numeric_answer: 402836000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: googl_net_income_fy2024
-  inputs:
-    query: What was Alphabet Inc.'s net income in FY2024?
-  metadata:
-    category: factual
-    company: GOOGL
-    companies: null
-    metric: net_income
-  expected_output:
-    answer: '100118000000.0'
-    numeric_answer: 100118000000.0
     sources: []
   evaluators:
   - NumericMatch: 0.05
@@ -617,20 +309,6 @@ cases:
     sources: []
   evaluators:
   - NumericMatch: 0.05
-- name: googl_total_assets_fy2024
-  inputs:
-    query: What was Alphabet Inc.'s total assets in FY2024?
-  metadata:
-    category: factual
-    company: GOOGL
-    companies: null
-    metric: total_assets
-  expected_output:
-    answer: '450256000000.0'
-    numeric_answer: 450256000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
 - name: googl_total_assets_fy2025
   inputs:
     query: What was Alphabet Inc.'s total assets in FY2025?
@@ -642,20 +320,6 @@ cases:
   expected_output:
     answer: '595281000000.0'
     numeric_answer: 595281000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: googl_total_liabilities_fy2024
-  inputs:
-    query: What was Alphabet Inc.'s total liabilities in FY2024?
-  metadata:
-    category: factual
-    company: GOOGL
-    companies: null
-    metric: total_liabilities
-  expected_output:
-    answer: '125172000000.0'
-    numeric_answer: 125172000000.0
     sources: []
   evaluators:
   - NumericMatch: 0.05
@@ -673,20 +337,6 @@ cases:
     sources: []
   evaluators:
   - NumericMatch: 0.05
-- name: googl_operating_income_fy2024
-  inputs:
-    query: What was Alphabet Inc.'s operating income in FY2024?
-  metadata:
-    category: factual
-    company: GOOGL
-    companies: null
-    metric: operating_income
-  expected_output:
-    answer: '112390000000.0'
-    numeric_answer: 112390000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
 - name: googl_operating_income_fy2025
   inputs:
     query: What was Alphabet Inc.'s operating income in FY2025?
@@ -698,20 +348,6 @@ cases:
   expected_output:
     answer: '129039000000.0'
     numeric_answer: 129039000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: googl_cost_of_revenue_fy2024
-  inputs:
-    query: What was Alphabet Inc.'s cost of revenue in FY2024?
-  metadata:
-    category: factual
-    company: GOOGL
-    companies: null
-    metric: cost_of_revenue
-  expected_output:
-    answer: '146306000000.0'
-    numeric_answer: 146306000000.0
     sources: []
   evaluators:
   - NumericMatch: 0.05
@@ -729,20 +365,6 @@ cases:
     sources: []
   evaluators:
   - NumericMatch: 0.05
-- name: googl_research_and_development_fy2024
-  inputs:
-    query: What was Alphabet Inc.'s R&D spending in FY2024?
-  metadata:
-    category: factual
-    company: GOOGL
-    companies: null
-    metric: research_and_development
-  expected_output:
-    answer: '49326000000.0'
-    numeric_answer: 49326000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
 - name: googl_research_and_development_fy2025
   inputs:
     query: What was Alphabet Inc.'s R&D spending in FY2025?
@@ -754,20 +376,6 @@ cases:
   expected_output:
     answer: '61087000000.0'
     numeric_answer: 61087000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: googl_stockholders_equity_fy2024
-  inputs:
-    query: What was Alphabet Inc.'s stockholders' equity in FY2024?
-  metadata:
-    category: factual
-    company: GOOGL
-    companies: null
-    metric: stockholders_equity
-  expected_output:
-    answer: '325084000000.0'
-    numeric_answer: 325084000000.0
     sources: []
   evaluators:
   - NumericMatch: 0.05
@@ -785,20 +393,6 @@ cases:
     sources: []
   evaluators:
   - NumericMatch: 0.05
-- name: googl_operating_cash_flow_fy2024
-  inputs:
-    query: What was Alphabet Inc.'s operating cash flow in FY2024?
-  metadata:
-    category: factual
-    company: GOOGL
-    companies: null
-    metric: operating_cash_flow
-  expected_output:
-    answer: '125299000000.0'
-    numeric_answer: 125299000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
 - name: googl_operating_cash_flow_fy2025
   inputs:
     query: What was Alphabet Inc.'s operating cash flow in FY2025?
@@ -810,20 +404,6 @@ cases:
   expected_output:
     answer: '164713000000.0'
     numeric_answer: 164713000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: amzn_revenue_fy2024
-  inputs:
-    query: What was AMAZON COM INC's total revenue in FY2024?
-  metadata:
-    category: factual
-    company: AMZN
-    companies: null
-    metric: revenue
-  expected_output:
-    answer: '637959000000.0'
-    numeric_answer: 637959000000.0
     sources: []
   evaluators:
   - NumericMatch: 0.05
@@ -841,20 +421,6 @@ cases:
     sources: []
   evaluators:
   - NumericMatch: 0.05
-- name: amzn_net_income_fy2024
-  inputs:
-    query: What was AMAZON COM INC's net income in FY2024?
-  metadata:
-    category: factual
-    company: AMZN
-    companies: null
-    metric: net_income
-  expected_output:
-    answer: '59248000000.0'
-    numeric_answer: 59248000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
 - name: amzn_net_income_fy2025
   inputs:
     query: What was AMAZON COM INC's net income in FY2025?
@@ -866,20 +432,6 @@ cases:
   expected_output:
     answer: '77670000000.0'
     numeric_answer: 77670000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: amzn_total_assets_fy2024
-  inputs:
-    query: What was AMAZON COM INC's total assets in FY2024?
-  metadata:
-    category: factual
-    company: AMZN
-    companies: null
-    metric: total_assets
-  expected_output:
-    answer: '624894000000.0'
-    numeric_answer: 624894000000.0
     sources: []
   evaluators:
   - NumericMatch: 0.05
@@ -897,20 +449,6 @@ cases:
     sources: []
   evaluators:
   - NumericMatch: 0.05
-- name: amzn_operating_income_fy2024
-  inputs:
-    query: What was AMAZON COM INC's operating income in FY2024?
-  metadata:
-    category: factual
-    company: AMZN
-    companies: null
-    metric: operating_income
-  expected_output:
-    answer: '68593000000.0'
-    numeric_answer: 68593000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
 - name: amzn_operating_income_fy2025
   inputs:
     query: What was AMAZON COM INC's operating income in FY2025?
@@ -922,20 +460,6 @@ cases:
   expected_output:
     answer: '79975000000.0'
     numeric_answer: 79975000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: amzn_cost_of_revenue_fy2024
-  inputs:
-    query: What was AMAZON COM INC's cost of revenue in FY2024?
-  metadata:
-    category: factual
-    company: AMZN
-    companies: null
-    metric: cost_of_revenue
-  expected_output:
-    answer: '326288000000.0'
-    numeric_answer: 326288000000.0
     sources: []
   evaluators:
   - NumericMatch: 0.05
@@ -953,20 +477,6 @@ cases:
     sources: []
   evaluators:
   - NumericMatch: 0.05
-- name: amzn_stockholders_equity_fy2024
-  inputs:
-    query: What was AMAZON COM INC's stockholders' equity in FY2024?
-  metadata:
-    category: factual
-    company: AMZN
-    companies: null
-    metric: stockholders_equity
-  expected_output:
-    answer: '285970000000.0'
-    numeric_answer: 285970000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
 - name: amzn_stockholders_equity_fy2025
   inputs:
     query: What was AMAZON COM INC's stockholders' equity in FY2025?
@@ -978,20 +488,6 @@ cases:
   expected_output:
     answer: '411065000000.0'
     numeric_answer: 411065000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: amzn_operating_cash_flow_fy2024
-  inputs:
-    query: What was AMAZON COM INC's operating cash flow in FY2024?
-  metadata:
-    category: factual
-    company: AMZN
-    companies: null
-    metric: operating_cash_flow
-  expected_output:
-    answer: '115877000000.0'
-    numeric_answer: 115877000000.0
     sources: []
   evaluators:
   - NumericMatch: 0.05
@@ -1009,20 +505,6 @@ cases:
     sources: []
   evaluators:
   - NumericMatch: 0.05
-- name: meta_revenue_fy2024
-  inputs:
-    query: What was Meta Platforms, Inc.'s total revenue in FY2024?
-  metadata:
-    category: factual
-    company: META
-    companies: null
-    metric: revenue
-  expected_output:
-    answer: '164501000000.0'
-    numeric_answer: 164501000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
 - name: meta_revenue_fy2025
   inputs:
     query: What was Meta Platforms, Inc.'s total revenue in FY2025?
@@ -1034,20 +516,6 @@ cases:
   expected_output:
     answer: '200966000000.0'
     numeric_answer: 200966000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: meta_net_income_fy2024
-  inputs:
-    query: What was Meta Platforms, Inc.'s net income in FY2024?
-  metadata:
-    category: factual
-    company: META
-    companies: null
-    metric: net_income
-  expected_output:
-    answer: '62360000000.0'
-    numeric_answer: 62360000000.0
     sources: []
   evaluators:
   - NumericMatch: 0.05
@@ -1065,20 +533,6 @@ cases:
     sources: []
   evaluators:
   - NumericMatch: 0.05
-- name: meta_total_assets_fy2024
-  inputs:
-    query: What was Meta Platforms, Inc.'s total assets in FY2024?
-  metadata:
-    category: factual
-    company: META
-    companies: null
-    metric: total_assets
-  expected_output:
-    answer: '276054000000.0'
-    numeric_answer: 276054000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
 - name: meta_total_assets_fy2025
   inputs:
     query: What was Meta Platforms, Inc.'s total assets in FY2025?
@@ -1090,20 +544,6 @@ cases:
   expected_output:
     answer: '366021000000.0'
     numeric_answer: 366021000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: meta_total_liabilities_fy2024
-  inputs:
-    query: What was Meta Platforms, Inc.'s total liabilities in FY2024?
-  metadata:
-    category: factual
-    company: META
-    companies: null
-    metric: total_liabilities
-  expected_output:
-    answer: '93417000000.0'
-    numeric_answer: 93417000000.0
     sources: []
   evaluators:
   - NumericMatch: 0.05
@@ -1121,20 +561,6 @@ cases:
     sources: []
   evaluators:
   - NumericMatch: 0.05
-- name: meta_operating_income_fy2024
-  inputs:
-    query: What was Meta Platforms, Inc.'s operating income in FY2024?
-  metadata:
-    category: factual
-    company: META
-    companies: null
-    metric: operating_income
-  expected_output:
-    answer: '69380000000.0'
-    numeric_answer: 69380000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
 - name: meta_operating_income_fy2025
   inputs:
     query: What was Meta Platforms, Inc.'s operating income in FY2025?
@@ -1146,20 +572,6 @@ cases:
   expected_output:
     answer: '83276000000.0'
     numeric_answer: 83276000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: meta_cost_of_revenue_fy2024
-  inputs:
-    query: What was Meta Platforms, Inc.'s cost of revenue in FY2024?
-  metadata:
-    category: factual
-    company: META
-    companies: null
-    metric: cost_of_revenue
-  expected_output:
-    answer: '30161000000.0'
-    numeric_answer: 30161000000.0
     sources: []
   evaluators:
   - NumericMatch: 0.05
@@ -1177,20 +589,6 @@ cases:
     sources: []
   evaluators:
   - NumericMatch: 0.05
-- name: meta_research_and_development_fy2024
-  inputs:
-    query: What was Meta Platforms, Inc.'s R&D spending in FY2024?
-  metadata:
-    category: factual
-    company: META
-    companies: null
-    metric: research_and_development
-  expected_output:
-    answer: '43873000000.0'
-    numeric_answer: 43873000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
 - name: meta_research_and_development_fy2025
   inputs:
     query: What was Meta Platforms, Inc.'s R&D spending in FY2025?
@@ -1202,20 +600,6 @@ cases:
   expected_output:
     answer: '57372000000.0'
     numeric_answer: 57372000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: meta_stockholders_equity_fy2024
-  inputs:
-    query: What was Meta Platforms, Inc.'s stockholders' equity in FY2024?
-  metadata:
-    category: factual
-    company: META
-    companies: null
-    metric: stockholders_equity
-  expected_output:
-    answer: '182637000000.0'
-    numeric_answer: 182637000000.0
     sources: []
   evaluators:
   - NumericMatch: 0.05
@@ -1233,20 +617,6 @@ cases:
     sources: []
   evaluators:
   - NumericMatch: 0.05
-- name: meta_operating_cash_flow_fy2024
-  inputs:
-    query: What was Meta Platforms, Inc.'s operating cash flow in FY2024?
-  metadata:
-    category: factual
-    company: META
-    companies: null
-    metric: operating_cash_flow
-  expected_output:
-    answer: '91328000000.0'
-    numeric_answer: 91328000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
 - name: meta_operating_cash_flow_fy2025
   inputs:
     query: What was Meta Platforms, Inc.'s operating cash flow in FY2025?
@@ -1258,34 +628,6 @@ cases:
   expected_output:
     answer: '115800000000.0'
     numeric_answer: 115800000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: nvda_revenue_fy2024
-  inputs:
-    query: What was NVIDIA CORP's total revenue in FY2024?
-  metadata:
-    category: factual
-    company: NVDA
-    companies: null
-    metric: revenue
-  expected_output:
-    answer: '60922000000.0'
-    numeric_answer: 60922000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: nvda_revenue_fy2025
-  inputs:
-    query: What was NVIDIA CORP's total revenue in FY2025?
-  metadata:
-    category: factual
-    company: NVDA
-    companies: null
-    metric: revenue
-  expected_output:
-    answer: '130497000000.0'
-    numeric_answer: 130497000000.0
     sources: []
   evaluators:
   - NumericMatch: 0.05
@@ -1303,34 +645,6 @@ cases:
     sources: []
   evaluators:
   - NumericMatch: 0.05
-- name: nvda_net_income_fy2024
-  inputs:
-    query: What was NVIDIA CORP's net income in FY2024?
-  metadata:
-    category: factual
-    company: NVDA
-    companies: null
-    metric: net_income
-  expected_output:
-    answer: '29760000000.0'
-    numeric_answer: 29760000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: nvda_net_income_fy2025
-  inputs:
-    query: What was NVIDIA CORP's net income in FY2025?
-  metadata:
-    category: factual
-    company: NVDA
-    companies: null
-    metric: net_income
-  expected_output:
-    answer: '72880000000.0'
-    numeric_answer: 72880000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
 - name: nvda_net_income_fy2026
   inputs:
     query: What was NVIDIA CORP's net income in FY2026?
@@ -1342,34 +656,6 @@ cases:
   expected_output:
     answer: '120067000000.0'
     numeric_answer: 120067000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: nvda_total_assets_fy2024
-  inputs:
-    query: What was NVIDIA CORP's total assets in FY2024?
-  metadata:
-    category: factual
-    company: NVDA
-    companies: null
-    metric: total_assets
-  expected_output:
-    answer: '65728000000.0'
-    numeric_answer: 65728000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: nvda_total_assets_fy2025
-  inputs:
-    query: What was NVIDIA CORP's total assets in FY2025?
-  metadata:
-    category: factual
-    company: NVDA
-    companies: null
-    metric: total_assets
-  expected_output:
-    answer: '111601000000.0'
-    numeric_answer: 111601000000.0
     sources: []
   evaluators:
   - NumericMatch: 0.05
@@ -1387,34 +673,6 @@ cases:
     sources: []
   evaluators:
   - NumericMatch: 0.05
-- name: nvda_total_liabilities_fy2024
-  inputs:
-    query: What was NVIDIA CORP's total liabilities in FY2024?
-  metadata:
-    category: factual
-    company: NVDA
-    companies: null
-    metric: total_liabilities
-  expected_output:
-    answer: '22750000000.0'
-    numeric_answer: 22750000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: nvda_total_liabilities_fy2025
-  inputs:
-    query: What was NVIDIA CORP's total liabilities in FY2025?
-  metadata:
-    category: factual
-    company: NVDA
-    companies: null
-    metric: total_liabilities
-  expected_output:
-    answer: '32274000000.0'
-    numeric_answer: 32274000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
 - name: nvda_total_liabilities_fy2026
   inputs:
     query: What was NVIDIA CORP's total liabilities in FY2026?
@@ -1426,34 +684,6 @@ cases:
   expected_output:
     answer: '49510000000.0'
     numeric_answer: 49510000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: nvda_operating_income_fy2024
-  inputs:
-    query: What was NVIDIA CORP's operating income in FY2024?
-  metadata:
-    category: factual
-    company: NVDA
-    companies: null
-    metric: operating_income
-  expected_output:
-    answer: '32972000000.0'
-    numeric_answer: 32972000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: nvda_operating_income_fy2025
-  inputs:
-    query: What was NVIDIA CORP's operating income in FY2025?
-  metadata:
-    category: factual
-    company: NVDA
-    companies: null
-    metric: operating_income
-  expected_output:
-    answer: '81453000000.0'
-    numeric_answer: 81453000000.0
     sources: []
   evaluators:
   - NumericMatch: 0.05
@@ -1471,34 +701,6 @@ cases:
     sources: []
   evaluators:
   - NumericMatch: 0.05
-- name: nvda_cost_of_revenue_fy2024
-  inputs:
-    query: What was NVIDIA CORP's cost of revenue in FY2024?
-  metadata:
-    category: factual
-    company: NVDA
-    companies: null
-    metric: cost_of_revenue
-  expected_output:
-    answer: '16621000000.0'
-    numeric_answer: 16621000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: nvda_cost_of_revenue_fy2025
-  inputs:
-    query: What was NVIDIA CORP's cost of revenue in FY2025?
-  metadata:
-    category: factual
-    company: NVDA
-    companies: null
-    metric: cost_of_revenue
-  expected_output:
-    answer: '32639000000.0'
-    numeric_answer: 32639000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
 - name: nvda_cost_of_revenue_fy2026
   inputs:
     query: What was NVIDIA CORP's cost of revenue in FY2026?
@@ -1510,34 +712,6 @@ cases:
   expected_output:
     answer: '62475000000.0'
     numeric_answer: 62475000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: nvda_gross_profit_fy2024
-  inputs:
-    query: What was NVIDIA CORP's gross profit in FY2024?
-  metadata:
-    category: factual
-    company: NVDA
-    companies: null
-    metric: gross_profit
-  expected_output:
-    answer: '44301000000.0'
-    numeric_answer: 44301000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: nvda_gross_profit_fy2025
-  inputs:
-    query: What was NVIDIA CORP's gross profit in FY2025?
-  metadata:
-    category: factual
-    company: NVDA
-    companies: null
-    metric: gross_profit
-  expected_output:
-    answer: '97858000000.0'
-    numeric_answer: 97858000000.0
     sources: []
   evaluators:
   - NumericMatch: 0.05
@@ -1555,34 +729,6 @@ cases:
     sources: []
   evaluators:
   - NumericMatch: 0.05
-- name: nvda_research_and_development_fy2024
-  inputs:
-    query: What was NVIDIA CORP's R&D spending in FY2024?
-  metadata:
-    category: factual
-    company: NVDA
-    companies: null
-    metric: research_and_development
-  expected_output:
-    answer: '8675000000.0'
-    numeric_answer: 8675000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: nvda_research_and_development_fy2025
-  inputs:
-    query: What was NVIDIA CORP's R&D spending in FY2025?
-  metadata:
-    category: factual
-    company: NVDA
-    companies: null
-    metric: research_and_development
-  expected_output:
-    answer: '12914000000.0'
-    numeric_answer: 12914000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
 - name: nvda_research_and_development_fy2026
   inputs:
     query: What was NVIDIA CORP's R&D spending in FY2026?
@@ -1597,34 +743,6 @@ cases:
     sources: []
   evaluators:
   - NumericMatch: 0.05
-- name: nvda_stockholders_equity_fy2024
-  inputs:
-    query: What was NVIDIA CORP's stockholders' equity in FY2024?
-  metadata:
-    category: factual
-    company: NVDA
-    companies: null
-    metric: stockholders_equity
-  expected_output:
-    answer: '42978000000.0'
-    numeric_answer: 42978000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: nvda_stockholders_equity_fy2025
-  inputs:
-    query: What was NVIDIA CORP's stockholders' equity in FY2025?
-  metadata:
-    category: factual
-    company: NVDA
-    companies: null
-    metric: stockholders_equity
-  expected_output:
-    answer: '79327000000.0'
-    numeric_answer: 79327000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
 - name: nvda_stockholders_equity_fy2026
   inputs:
     query: What was NVIDIA CORP's stockholders' equity in FY2026?
@@ -1636,34 +754,6 @@ cases:
   expected_output:
     answer: '157293000000.0'
     numeric_answer: 157293000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: nvda_operating_cash_flow_fy2024
-  inputs:
-    query: What was NVIDIA CORP's operating cash flow in FY2024?
-  metadata:
-    category: factual
-    company: NVDA
-    companies: null
-    metric: operating_cash_flow
-  expected_output:
-    answer: '28090000000.0'
-    numeric_answer: 28090000000.0
-    sources: []
-  evaluators:
-  - NumericMatch: 0.05
-- name: nvda_operating_cash_flow_fy2025
-  inputs:
-    query: What was NVIDIA CORP's operating cash flow in FY2025?
-  metadata:
-    category: factual
-    company: NVDA
-    companies: null
-    metric: operating_cash_flow
-  expected_output:
-    answer: '64089000000.0'
-    numeric_answer: 64089000000.0
     sources: []
   evaluators:
   - NumericMatch: 0.05

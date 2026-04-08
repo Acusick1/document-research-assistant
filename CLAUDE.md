@@ -52,8 +52,9 @@ These are deliberate decisions — do not change without discussion.
 
 ## Eval Dataset
 
-- **Tier 1-2**: auto-generated from XBRL. Lean into volume (~100 and ~60 questions).
-- **Tier 3-4**: manually curated. Start with 5-10 seeds each in Phase 0 (enough to prove the harness works), expand after Phase 1 when real failure modes are visible.
+- **Factual (auto-generated)**: latest fiscal year only per company-metric (~55 cases). Multi-year retrieval is covered by the temporal dataset.
+- **Comparison (auto-generated)**: 2 pairs per concept (~20 cases).
+- **Temporal / Multihop**: manually curated, 5-10 seeds each. Expand after Phase 1 when real failure modes are visible.
 - **Stored as**: YAML in `src/research_assistant/eval/datasets/`, version controlled.
 - **Reporting**: per-tier accuracy with 95% confidence intervals. Never a single aggregate score.
 

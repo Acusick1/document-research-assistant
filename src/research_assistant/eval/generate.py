@@ -127,6 +127,7 @@ def generate_factual_cases(
     identity: str = "ResearchAssistant research@example.com",
     min_year: int = 2022,
     cache: EdgarCache | None = None,
+    max_years: int = 1,
 ) -> list[Case[EvalInput, EvalOutput, EvalMetadata]]:
     set_identity(identity)
     cases: list[Case[EvalInput, EvalOutput, EvalMetadata]] = []
@@ -144,7 +145,8 @@ def generate_factual_cases(
                 logger.debug("No annual data for %s/%s", ticker, concept)
                 continue
 
-            for fy, value in annual.items():
+            latest_years = dict(sorted(annual.items(), reverse=True)[:max_years])
+            for fy, value in latest_years.items():
                 case = Case(
                     name=f"{ticker.lower()}_{concept}_{fy.lower()}",
                     inputs=EvalInput(
@@ -208,7 +210,7 @@ def generate_comparison_cases(
     identity: str = "ResearchAssistant research@example.com",
     min_year: int = 2022,
     cache: EdgarCache | None = None,
-    max_pairs_per_concept: int = 3,
+    max_pairs_per_concept: int = 2,
 ) -> list[Case[EvalInput, EvalOutput, EvalMetadata]]:
     set_identity(identity)
 

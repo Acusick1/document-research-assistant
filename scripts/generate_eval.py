@@ -26,8 +26,12 @@ def main() -> None:
         "--no-cache", action="store_true", help="Bypass the disk cache for EDGAR API responses"
     )
     parser.add_argument(
-        "--max-comparison-pairs", type=int, default=3,
+        "--max-comparison-pairs", type=int, default=2,
         help="Max ticker pairs per concept in comparison cases",
+    )
+    parser.add_argument(
+        "--max-years", type=int, default=1,
+        help="Max fiscal years per company-metric in factual cases (latest N)",
     )
     args = parser.parse_args()
 
@@ -38,7 +42,8 @@ def main() -> None:
 
     logger.info("Generating factual cases for %s", args.tickers)
     factual_cases = generate_factual_cases(
-        args.tickers, identity=args.identity, min_year=args.min_year, cache=cache
+        args.tickers, identity=args.identity, min_year=args.min_year, cache=cache,
+        max_years=args.max_years,
     )
     logger.info("Generated %d factual cases", len(factual_cases))
 

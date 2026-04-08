@@ -37,24 +37,6 @@ cases:
   evaluators:
   - AnswerContains
   - ContextPrecision
-- name: aapl_vs_amzn_revenue
-  inputs:
-    query: Which company had higher total revenue, Apple Inc. (FY2025) or AMAZON COM
-      INC (FY2025)?
-  metadata:
-    category: comparison
-    company: AMZN
-    companies:
-    - AAPL
-    - AMZN
-    metric: revenue
-  expected_output:
-    answer: AMAZON COM INC
-    numeric_answer: null
-    sources: []
-  evaluators:
-  - AnswerContains
-  - ContextPrecision
 - name: aapl_vs_msft_net_income
   inputs:
     query: Which company had higher net income, Apple Inc. (FY2025) or MICROSOFT CORP
@@ -86,24 +68,6 @@ cases:
     metric: net_income
   expected_output:
     answer: Alphabet Inc.
-    numeric_answer: null
-    sources: []
-  evaluators:
-  - AnswerContains
-  - ContextPrecision
-- name: aapl_vs_amzn_net_income
-  inputs:
-    query: Which company had higher net income, Apple Inc. (FY2025) or AMAZON COM
-      INC (FY2025)?
-  metadata:
-    category: comparison
-    company: AAPL
-    companies:
-    - AAPL
-    - AMZN
-    metric: net_income
-  expected_output:
-    answer: Apple Inc.
     numeric_answer: null
     sources: []
   evaluators:
@@ -145,24 +109,6 @@ cases:
   evaluators:
   - AnswerContains
   - ContextPrecision
-- name: aapl_vs_amzn_total_assets
-  inputs:
-    query: Which company had higher total assets, Apple Inc. (FY2025) or AMAZON COM
-      INC (FY2025)?
-  metadata:
-    category: comparison
-    company: AMZN
-    companies:
-    - AAPL
-    - AMZN
-    metric: total_assets
-  expected_output:
-    answer: AMAZON COM INC
-    numeric_answer: null
-    sources: []
-  evaluators:
-  - AnswerContains
-  - ContextPrecision
 - name: aapl_vs_msft_total_liabilities
   inputs:
     query: Which company had higher total liabilities, Apple Inc. (FY2025) or MICROSOFT
@@ -191,24 +137,6 @@ cases:
     companies:
     - AAPL
     - GOOGL
-    metric: total_liabilities
-  expected_output:
-    answer: Apple Inc.
-    numeric_answer: null
-    sources: []
-  evaluators:
-  - AnswerContains
-  - ContextPrecision
-- name: aapl_vs_meta_total_liabilities
-  inputs:
-    query: Which company had higher total liabilities, Apple Inc. (FY2025) or Meta
-      Platforms, Inc. (FY2025)?
-  metadata:
-    category: comparison
-    company: AAPL
-    companies:
-    - AAPL
-    - META
     metric: total_liabilities
   expected_output:
     answer: Apple Inc.
@@ -253,24 +181,6 @@ cases:
   evaluators:
   - AnswerContains
   - ContextPrecision
-- name: aapl_vs_amzn_operating_income
-  inputs:
-    query: Which company had higher operating income, Apple Inc. (FY2025) or AMAZON
-      COM INC (FY2025)?
-  metadata:
-    category: comparison
-    company: AAPL
-    companies:
-    - AAPL
-    - AMZN
-    metric: operating_income
-  expected_output:
-    answer: Apple Inc.
-    numeric_answer: null
-    sources: []
-  evaluators:
-  - AnswerContains
-  - ContextPrecision
 - name: aapl_vs_msft_cost_of_revenue
   inputs:
     query: Which company had higher cost of revenue, Apple Inc. (FY2025) or MICROSOFT
@@ -302,24 +212,6 @@ cases:
     metric: cost_of_revenue
   expected_output:
     answer: Apple Inc.
-    numeric_answer: null
-    sources: []
-  evaluators:
-  - AnswerContains
-  - ContextPrecision
-- name: aapl_vs_amzn_cost_of_revenue
-  inputs:
-    query: Which company had higher cost of revenue, Apple Inc. (FY2025) or AMAZON
-      COM INC (FY2025)?
-  metadata:
-    category: comparison
-    company: AMZN
-    companies:
-    - AAPL
-    - AMZN
-    metric: cost_of_revenue
-  expected_output:
-    answer: AMAZON COM INC
     numeric_answer: null
     sources: []
   evaluators:
@@ -361,24 +253,6 @@ cases:
   evaluators:
   - AnswerContains
   - ContextPrecision
-- name: msft_vs_nvda_gross_profit
-  inputs:
-    query: Which company had higher gross profit, MICROSOFT CORP (FY2025) or NVIDIA
-      CORP (FY2026)?
-  metadata:
-    category: comparison
-    company: MSFT
-    companies:
-    - MSFT
-    - NVDA
-    metric: gross_profit
-  expected_output:
-    answer: MICROSOFT CORP
-    numeric_answer: null
-    sources: []
-  evaluators:
-  - AnswerContains
-  - ContextPrecision
 - name: aapl_vs_msft_research_and_development
   inputs:
     query: Which company had higher R&D spending, Apple Inc. (FY2025) or MICROSOFT
@@ -410,24 +284,6 @@ cases:
     metric: research_and_development
   expected_output:
     answer: Alphabet Inc.
-    numeric_answer: null
-    sources: []
-  evaluators:
-  - AnswerContains
-  - ContextPrecision
-- name: aapl_vs_meta_research_and_development
-  inputs:
-    query: Which company had higher R&D spending, Apple Inc. (FY2025) or Meta Platforms,
-      Inc. (FY2025)?
-  metadata:
-    category: comparison
-    company: META
-    companies:
-    - AAPL
-    - META
-    metric: research_and_development
-  expected_output:
-    answer: Meta Platforms, Inc.
     numeric_answer: null
     sources: []
   evaluators:
@@ -469,24 +325,6 @@ cases:
   evaluators:
   - AnswerContains
   - ContextPrecision
-- name: aapl_vs_amzn_stockholders_equity
-  inputs:
-    query: Which company had higher stockholders' equity, Apple Inc. (FY2025) or AMAZON
-      COM INC (FY2025)?
-  metadata:
-    category: comparison
-    company: AMZN
-    companies:
-    - AAPL
-    - AMZN
-    metric: stockholders_equity
-  expected_output:
-    answer: AMAZON COM INC
-    numeric_answer: null
-    sources: []
-  evaluators:
-  - AnswerContains
-  - ContextPrecision
 - name: aapl_vs_msft_operating_cash_flow
   inputs:
     query: Which company had higher operating cash flow, Apple Inc. (FY2025) or MICROSOFT
@@ -518,24 +356,6 @@ cases:
     metric: operating_cash_flow
   expected_output:
     answer: Alphabet Inc.
-    numeric_answer: null
-    sources: []
-  evaluators:
-  - AnswerContains
-  - ContextPrecision
-- name: aapl_vs_amzn_operating_cash_flow
-  inputs:
-    query: Which company had higher operating cash flow, Apple Inc. (FY2025) or AMAZON
-      COM INC (FY2025)?
-  metadata:
-    category: comparison
-    company: AMZN
-    companies:
-    - AAPL
-    - AMZN
-    metric: operating_cash_flow
-  expected_output:
-    answer: AMAZON COM INC
     numeric_answer: null
     sources: []
   evaluators:
