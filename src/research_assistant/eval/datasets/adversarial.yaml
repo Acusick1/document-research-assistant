@@ -1,0 +1,129 @@
+name: adversarial
+evaluators:
+- LLMJudge:
+    rubric: >-
+      Evaluate whether the output handles this edge case appropriately. The output
+      should NOT fabricate information. For questions about data not in the corpus,
+      the output should clearly state the information is unavailable. For ambiguous
+      questions, the output should acknowledge ambiguity or ask for clarification
+      rather than guessing. For questions mixing valid and invalid requests, the
+      output should answer what it can and flag what it cannot. A confident wrong
+      answer is worse than an honest "I don't know."
+    include_input: true
+    include_expected_output: true
+- RetrievalRelevance: {}
+report_evaluators: []
+cases:
+# --- Out-of-corpus: companies not ingested ---
+- name: unknown_company
+  inputs:
+    query: What was Walmart's total revenue in FY2025?
+  metadata:
+    category: adversarial
+    company: WMT
+  expected_output:
+    answer: "The information about Walmart is not available in the retrieved filings."
+
+- name: unknown_ticker
+  inputs:
+    query: What was TSLA's net income in FY2025?
+  metadata:
+    category: adversarial
+    company: TSLA
+  expected_output:
+    answer: "Tesla's financial data is not available in the retrieved filings."
+
+# --- Out-of-corpus: wrong time period ---
+- name: future_fiscal_year
+  inputs:
+    query: What was Apple's revenue in FY2027?
+  metadata:
+    category: adversarial
+    company: AAPL
+  expected_output:
+    answer: "FY2027 data is not available. The most recent Apple filing covers FY2025."
+
+- name: old_fiscal_year
+  inputs:
+    query: What was Microsoft's net income in FY2015?
+  metadata:
+    category: adversarial
+    company: MSFT
+  expected_output:
+    answer: "FY2015 data is not available in the retrieved filings."
+
+# --- Out-of-corpus: wrong filing type ---
+- name: quarterly_data
+  inputs:
+    query: What was Google's revenue in Q2 2025?
+  metadata:
+    category: adversarial
+    company: GOOGL
+  expected_output:
+    answer: "Quarterly data is not available. Only annual 10-K filings are in the corpus."
+
+# --- Ambiguous queries ---
+- name: ambiguous_metric
+  inputs:
+    query: How much money did Apple make in 2025?
+  metadata:
+    category: adversarial
+    company: AAPL
+  expected_output:
+    answer: "This could refer to revenue, net income, or operating income. The answer should clarify which metric is being reported or acknowledge the ambiguity."
+
+- name: ambiguous_company
+  inputs:
+    query: What was the company's total revenue last year?
+  metadata:
+    category: adversarial
+  expected_output:
+    answer: "The question does not specify which company. The system should ask for clarification or state it cannot determine which company is meant."
+
+# --- Nonsense / off-topic ---
+- name: off_topic
+  inputs:
+    query: What is the capital of France?
+  metadata:
+    category: adversarial
+  expected_output:
+    answer: "This question is outside the scope of SEC financial filings."
+
+- name: gibberish
+  inputs:
+    query: asdf qwerty zxcv 12345
+  metadata:
+    category: adversarial
+  expected_output:
+    answer: "The query is not a valid financial question."
+
+# --- Misleading / trick questions ---
+- name: false_premise
+  inputs:
+    query: Why did NVIDIA file for bankruptcy in FY2026?
+  metadata:
+    category: adversarial
+    company: NVDA
+  expected_output:
+    answer: "NVIDIA did not file for bankruptcy. The system should reject the false premise rather than fabricating an explanation."
+
+- name: fabricated_metric
+  inputs:
+    query: What was Apple's customer happiness index in FY2025?
+  metadata:
+    category: adversarial
+    company: AAPL
+  expected_output:
+    answer: "There is no 'customer happiness index' in SEC filings. The system should say this metric does not exist in the data."
+
+# --- Partial overlap ---
+- name: mixed_known_unknown
+  inputs:
+    query: Compare the revenue of Apple and Walmart in FY2025.
+  metadata:
+    category: adversarial
+    companies:
+    - AAPL
+    - WMT
+  expected_output:
+    answer: "Apple's revenue is available but Walmart's is not in the corpus. The system should provide Apple's figure and flag Walmart as unavailable."
