@@ -63,7 +63,7 @@ class EdgarChunker:
 
         for section_name, text in document.sections.items():
             prefix = _build_context_prefix(base_metadata, section_name)
-            prefix_tokens = self._chunker._tokenizer.count_tokens(prefix)
+            prefix_tokens = self._chunker.tokenizer.count_tokens(prefix)
             if prefix_tokens > CONTEXT_PREFIX_TOKEN_BUDGET:
                 logger.warning(
                     "Context prefix for %s %s exceeds budget (%d > %d tokens): %r",
