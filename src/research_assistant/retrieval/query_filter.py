@@ -5,7 +5,8 @@ from datetime import date
 
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent
-from qdrant_client.models import FieldCondition, Filter, MatchValue
+from qdrant_client.http.models.models import Condition
+from qdrant_client.models import FieldCondition, Filter, MatchAny, MatchValue
 
 from research_assistant.retrieval.vector_store import QdrantStore
 
@@ -82,9 +83,33 @@ class QueryFilters(BaseModel):
     tickers: list[str] = Field(default_factory=list)
     fiscal_years: list[int] = Field(default_factory=list)
 
+    def to_qdrant_filter(self) -> Filter | None:
+        conditions: list[Condition] = []
+        if len(self.tickers) == 1:
+            conditions.append(
+                FieldCondition(key="ticker", match=MatchValue(value=self.tickers[0])),
+            )
+        elif len(self.tickers) > 1:
+            conditions.append(
+                FieldCondition(key="ticker", match=MatchAny(any=self.tickers)),
+            )
+        if len(self.fiscal_years) == 1:
+            conditions.append(
+                FieldCondition(
+                    key="fiscal_year", match=MatchValue(value=self.fiscal_years[0]),
+                ),
+            )
+        elif len(self.fiscal_years) > 1:
+            conditions.append(
+                FieldCondition(
+                    key="fiscal_year", match=MatchAny(any=self.fiscal_years),
+                ),
+            )
+        return Filter(must=conditions) if conditions else None
+
 
 class FilterResult(BaseModel):
-    query_filters: QueryFilters = Field(default_factory=QueryFilters)
+    qdrant_filter: Filter | None = None
     reject_reason: str | None = None
 
 
@@ -138,7 +163,7 @@ class QueryFilterExtractor:
 
         query_filters = self._resolve(entities)
         logger.info("Query: %r -> filters: %s", query, query_filters)
-        return FilterResult(query_filters=query_filters)
+        return FilterResult(qdrant_filter=query_filters.to_qdrant_filter())
 
     def _resolve(self, entities: ExtractedEntities) -> QueryFilters:
         tickers: list[str] = []

@@ -58,7 +58,7 @@ class RagPipeline:
         query_vector = self._embedder.embed([eval_input.query])[0].tolist()
         search_top_k = self._rerank_top_k if self._reranker else self._top_k
         results = self._store.search(
-            query_vector, top_k=search_top_k, filters=filter_result.query_filters,
+            query_vector, top_k=search_top_k, qdrant_filter=filter_result.qdrant_filter,
         )
         if self._reranker:
             results = self._reranker.rerank(eval_input.query, results, top_k=self._top_k)

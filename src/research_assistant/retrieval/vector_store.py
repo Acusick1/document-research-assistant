@@ -1,10 +1,6 @@
 from __future__ import annotations
 
 import uuid
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from research_assistant.retrieval.query_filter import QueryFilters
 
 from pydantic import BaseModel, ConfigDict
 from qdrant_client import QdrantClient
@@ -14,7 +10,6 @@ from qdrant_client.models import (
     Distance,
     FieldCondition,
     Filter,
-    MatchAny,
     MatchValue,
     OrderBy,
     PayloadSchemaType,
@@ -112,34 +107,8 @@ class QdrantStore:
         self,
         vector: list[float],
         top_k: int = 5,
-        filters: QueryFilters | None = None,
+        qdrant_filter: Filter | None = None,
     ) -> list[SearchResult]:
-        qdrant_filter = None
-        if filters:
-            conditions: list[FieldCondition] = []
-            if len(filters.tickers) == 1:
-                conditions.append(
-                    FieldCondition(key="ticker", match=MatchValue(value=filters.tickers[0]))
-                )
-            elif len(filters.tickers) > 1:
-                conditions.append(
-                    FieldCondition(key="ticker", match=MatchAny(any=filters.tickers))
-                )
-            if len(filters.fiscal_years) == 1:
-                conditions.append(
-                    FieldCondition(
-                        key="fiscal_year", match=MatchValue(value=filters.fiscal_years[0]),
-                    )
-                )
-            elif len(filters.fiscal_years) > 1:
-                conditions.append(
-                    FieldCondition(
-                        key="fiscal_year", match=MatchAny(any=filters.fiscal_years),
-                    )
-                )
-            if conditions:
-                qdrant_filter = Filter(must=conditions)
-
         results = self.client.query_points(
             collection_name=self.collection_name,
             query=vector,

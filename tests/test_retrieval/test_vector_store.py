@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import pytest
 from qdrant_client import QdrantClient
+from qdrant_client.models import FieldCondition, Filter, MatchValue
 
 from research_assistant.corpus.models import Chunk
-from research_assistant.retrieval.query_filter import QueryFilters
 from research_assistant.retrieval.vector_store import QdrantStore
 
 
@@ -95,7 +95,10 @@ class TestQdrantStore:
         results = store.search(
             [0.5, 0.5, 0.0, 0.0],
             top_k=2,
-            filters=QueryFilters(tickers=["AAPL"], fiscal_years=[2025]),
+            qdrant_filter=Filter(must=[
+                FieldCondition(key="ticker", match=MatchValue(value="AAPL")),
+                FieldCondition(key="fiscal_year", match=MatchValue(value=2025)),
+            ]),
         )
         assert len(results) == 1
         assert results[0].fiscal_year == 2025

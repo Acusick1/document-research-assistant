@@ -3,6 +3,7 @@ from __future__ import annotations
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+from qdrant_client.models import FieldCondition, Filter, MatchAny, MatchValue
 
 from research_assistant.retrieval.query_filter import (
     ExtractedEntities,
@@ -235,7 +236,7 @@ class TestExtract:
 
         result = await extractor.extract("What is the capital of France?")
         assert result.reject_reason == "Question is outside the scope of SEC financial filings."
-        assert result.query_filters == QueryFilters()
+        assert result.qdrant_filter is None
 
     @pytest.mark.anyio
     async def test_valid_query(self, extractor: QueryFilterExtractor) -> None:
@@ -247,7 +248,11 @@ class TestExtract:
 
         result = await extractor.extract("What was Apple's revenue in FY2025?")
         assert result.reject_reason is None
-        assert result.query_filters == QueryFilters(tickers=["AAPL"], fiscal_years=[2025])
+        expected = Filter(must=[
+            FieldCondition(key="ticker", match=MatchValue(value="AAPL")),
+            FieldCondition(key="fiscal_year", match=MatchValue(value=2025)),
+        ])
+        assert result.qdrant_filter == expected
 
     @pytest.mark.anyio
     async def test_agent_failure_returns_empty(
@@ -257,4 +262,47 @@ class TestExtract:
 
         result = await extractor.extract("some query")
         assert result.reject_reason is None
-        assert result.query_filters == QueryFilters()
+        assert result.qdrant_filter is None
+
+
+class TestQueryFiltersToQdrantFilter:
+    def test_single_ticker_single_year(self) -> None:
+        qf = QueryFilters(tickers=["AAPL"], fiscal_years=[2024])
+        result = qf.to_qdrant_filter()
+        assert result == Filter(must=[
+            FieldCondition(key="ticker", match=MatchValue(value="AAPL")),
+            FieldCondition(key="fiscal_year", match=MatchValue(value=2024)),
+        ])
+
+    def test_multiple_tickers(self) -> None:
+        qf = QueryFilters(tickers=["AAPL", "MSFT"], fiscal_years=[2024])
+        result = qf.to_qdrant_filter()
+        assert result == Filter(must=[
+            FieldCondition(key="ticker", match=MatchAny(any=["AAPL", "MSFT"])),
+            FieldCondition(key="fiscal_year", match=MatchValue(value=2024)),
+        ])
+
+    def test_multiple_years(self) -> None:
+        qf = QueryFilters(tickers=["AAPL"], fiscal_years=[2023, 2024])
+        result = qf.to_qdrant_filter()
+        assert result == Filter(must=[
+            FieldCondition(key="ticker", match=MatchValue(value="AAPL")),
+            FieldCondition(key="fiscal_year", match=MatchAny(any=[2023, 2024])),
+        ])
+
+    def test_empty_returns_none(self) -> None:
+        assert QueryFilters().to_qdrant_filter() is None
+
+    def test_tickers_only(self) -> None:
+        qf = QueryFilters(tickers=["AAPL"])
+        result = qf.to_qdrant_filter()
+        assert result == Filter(must=[
+            FieldCondition(key="ticker", match=MatchValue(value="AAPL")),
+        ])
+
+    def test_fiscal_years_only(self) -> None:
+        qf = QueryFilters(fiscal_years=[2024])
+        result = qf.to_qdrant_filter()
+        assert result == Filter(must=[
+            FieldCondition(key="fiscal_year", match=MatchValue(value=2024)),
+        ])
