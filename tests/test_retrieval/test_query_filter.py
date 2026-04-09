@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from unittest.mock import MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+from qdrant_client.models import FieldCondition, Filter, MatchAny, MatchValue
 
 from research_assistant.retrieval.query_filter import (
     ExtractedEntities,
@@ -10,6 +11,75 @@ from research_assistant.retrieval.query_filter import (
     QueryFilters,
     YearRange,
 )
+
+NAME_TO_TICKER = {
+    "aapl": "AAPL",
+    "apple inc.": "AAPL",
+    "msft": "MSFT",
+    "microsoft corp": "MSFT",
+    "googl": "GOOGL",
+    "alphabet inc.": "GOOGL",
+    "meta": "META",
+    "meta platforms, inc.": "META",
+    "amzn": "AMZN",
+    "amazon com inc": "AMZN",
+    "nvda": "NVDA",
+    "nvidia corp": "NVDA",
+}
+
+
+def _mock_store(
+    tickers: dict[str, str] | None = None,
+    valid_years: list[int] | None = None,
+) -> MagicMock:
+    tickers = tickers or NAME_TO_TICKER
+    valid_years = valid_years or [2022, 2023, 2024, 2025]
+
+    store = MagicMock()
+
+    unique_tickers = list(dict.fromkeys(tickers.values()))
+    ticker_company = {}
+    for name, ticker in tickers.items():
+        if ticker not in ticker_company and name != ticker.lower():
+            ticker_company[ticker] = name
+
+    def get_field_values(field: str) -> list[MagicMock]:
+        if field == "ticker":
+            return [MagicMock(value=t) for t in unique_tickers]
+        if field == "fiscal_year":
+            return [MagicMock(value=y) for y in valid_years]
+        return []
+
+    store.get_field_values.side_effect = get_field_values
+
+    def scroll(**kwargs: object) -> tuple[list[MagicMock], None]:
+        scroll_filter = kwargs.get("scroll_filter")
+        if scroll_filter:
+            for cond in scroll_filter.must:
+                if cond.key == "ticker":
+                    ticker = cond.match.value
+                    company = ticker_company.get(ticker, "")
+                    point = MagicMock()
+                    point.payload = {"company_name": company}
+                    return [point], None
+        return [], None
+
+    store.client.scroll.side_effect = scroll
+    store.collection_name = "test"
+    store.get_latest_fiscal_year.return_value = max(valid_years) if valid_years else None
+
+    return store
+
+
+def _make_extractor(
+    store: MagicMock | None = None,
+    valid_years: list[int] | None = None,
+) -> QueryFilterExtractor:
+    store = store or _mock_store(valid_years=valid_years)
+    with patch("research_assistant.retrieval.query_filter.Agent"):
+        extractor = QueryFilterExtractor(store=store, model="test-model")
+    extractor._agent = AsyncMock()
+    return extractor
 
 
 class TestYearRangeExpand:
@@ -48,28 +118,7 @@ class TestYearRangeExpand:
 class TestResolve:
     @pytest.fixture
     def extractor(self) -> QueryFilterExtractor:
-        extractor = object.__new__(QueryFilterExtractor)
-        extractor._name_to_ticker = {
-            "aapl": "AAPL",
-            "apple inc.": "AAPL",
-            "msft": "MSFT",
-            "microsoft corp": "MSFT",
-            "googl": "GOOGL",
-            "alphabet inc.": "GOOGL",
-            "meta": "META",
-            "meta platforms, inc.": "META",
-            "amzn": "AMZN",
-            "amazon com inc": "AMZN",
-            "nvda": "NVDA",
-            "nvidia corp": "NVDA",
-        }
-        store = MagicMock()
-        store.get_field_values.return_value = [
-            MagicMock(value=y) for y in [2022, 2023, 2024, 2025]
-        ]
-        store.get_latest_fiscal_year.return_value = 2025
-        extractor._store = store
-        return extractor
+        return _make_extractor()
 
     def test_single_ticker_single_year(self, extractor: QueryFilterExtractor) -> None:
         entities = ExtractedEntities(
@@ -172,27 +221,88 @@ class TestResolve:
         assert result.tickers == ["GOOGL"]
 
 
-class TestToQdrantFilters:
+class TestExtract:
     @pytest.fixture
     def extractor(self) -> QueryFilterExtractor:
-        return object.__new__(QueryFilterExtractor)
+        return _make_extractor()
 
-    def test_single_ticker_single_year(self, extractor: QueryFilterExtractor) -> None:
-        filters = QueryFilters(tickers=["AAPL"], fiscal_years=[2024])
-        result = extractor._to_qdrant_filters(filters)
-        assert result == {"ticker": "AAPL", "fiscal_year": 2024}
+    @pytest.mark.anyio
+    async def test_rejected_query(self, extractor: QueryFilterExtractor) -> None:
+        mock_result = MagicMock()
+        mock_result.output = ExtractedEntities(
+            reject_reason="Question is outside the scope of SEC financial filings.",
+        )
+        extractor._agent.run.return_value = mock_result
 
-    def test_multiple_tickers(self, extractor: QueryFilterExtractor) -> None:
-        filters = QueryFilters(tickers=["AAPL", "MSFT"], fiscal_years=[2024])
-        result = extractor._to_qdrant_filters(filters)
-        assert result == {"ticker": ["AAPL", "MSFT"], "fiscal_year": 2024}
+        result = await extractor.extract("What is the capital of France?")
+        assert result.reject_reason == "Question is outside the scope of SEC financial filings."
+        assert result.qdrant_filter is None
 
-    def test_no_filters(self, extractor: QueryFilterExtractor) -> None:
-        filters = QueryFilters(tickers=[], fiscal_years=[])
-        result = extractor._to_qdrant_filters(filters)
-        assert result == {}
+    @pytest.mark.anyio
+    async def test_valid_query(self, extractor: QueryFilterExtractor) -> None:
+        mock_result = MagicMock()
+        mock_result.output = ExtractedEntities(
+            companies=["AAPL"], year_range=YearRange(start=2025, end=2025),
+        )
+        extractor._agent.run.return_value = mock_result
 
-    def test_multiple_years(self, extractor: QueryFilterExtractor) -> None:
-        filters = QueryFilters(tickers=["AAPL"], fiscal_years=[2023, 2024])
-        result = extractor._to_qdrant_filters(filters)
-        assert result == {"ticker": "AAPL", "fiscal_year": [2023, 2024]}
+        result = await extractor.extract("What was Apple's revenue in FY2025?")
+        assert result.reject_reason is None
+        expected = Filter(must=[
+            FieldCondition(key="ticker", match=MatchValue(value="AAPL")),
+            FieldCondition(key="fiscal_year", match=MatchValue(value=2025)),
+        ])
+        assert result.qdrant_filter == expected
+
+    @pytest.mark.anyio
+    async def test_agent_failure_returns_empty(
+        self, extractor: QueryFilterExtractor,
+    ) -> None:
+        extractor._agent.run.side_effect = RuntimeError("LLM error")
+
+        result = await extractor.extract("some query")
+        assert result.reject_reason is None
+        assert result.qdrant_filter is None
+
+
+class TestQueryFiltersToQdrantFilter:
+    def test_single_ticker_single_year(self) -> None:
+        qf = QueryFilters(tickers=["AAPL"], fiscal_years=[2024])
+        result = qf.to_qdrant_filter()
+        assert result == Filter(must=[
+            FieldCondition(key="ticker", match=MatchValue(value="AAPL")),
+            FieldCondition(key="fiscal_year", match=MatchValue(value=2024)),
+        ])
+
+    def test_multiple_tickers(self) -> None:
+        qf = QueryFilters(tickers=["AAPL", "MSFT"], fiscal_years=[2024])
+        result = qf.to_qdrant_filter()
+        assert result == Filter(must=[
+            FieldCondition(key="ticker", match=MatchAny(any=["AAPL", "MSFT"])),
+            FieldCondition(key="fiscal_year", match=MatchValue(value=2024)),
+        ])
+
+    def test_multiple_years(self) -> None:
+        qf = QueryFilters(tickers=["AAPL"], fiscal_years=[2023, 2024])
+        result = qf.to_qdrant_filter()
+        assert result == Filter(must=[
+            FieldCondition(key="ticker", match=MatchValue(value="AAPL")),
+            FieldCondition(key="fiscal_year", match=MatchAny(any=[2023, 2024])),
+        ])
+
+    def test_empty_returns_none(self) -> None:
+        assert QueryFilters().to_qdrant_filter() is None
+
+    def test_tickers_only(self) -> None:
+        qf = QueryFilters(tickers=["AAPL"])
+        result = qf.to_qdrant_filter()
+        assert result == Filter(must=[
+            FieldCondition(key="ticker", match=MatchValue(value="AAPL")),
+        ])
+
+    def test_fiscal_years_only(self) -> None:
+        qf = QueryFilters(fiscal_years=[2024])
+        result = qf.to_qdrant_filter()
+        assert result == Filter(must=[
+            FieldCondition(key="fiscal_year", match=MatchValue(value=2024)),
+        ])

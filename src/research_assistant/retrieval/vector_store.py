@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import uuid
-from typing import Any
 
 from pydantic import BaseModel, ConfigDict
 from qdrant_client import QdrantClient
@@ -11,7 +10,6 @@ from qdrant_client.models import (
     Distance,
     FieldCondition,
     Filter,
-    MatchAny,
     MatchValue,
     OrderBy,
     PayloadSchemaType,
@@ -109,18 +107,8 @@ class QdrantStore:
         self,
         vector: list[float],
         top_k: int = 5,
-        filters: dict[str, Any] | None = None,
+        qdrant_filter: Filter | None = None,
     ) -> list[SearchResult]:
-        qdrant_filter = None
-        if filters:
-            conditions = []
-            for k, v in filters.items():
-                if isinstance(v, list):
-                    conditions.append(FieldCondition(key=k, match=MatchAny(any=v)))
-                else:
-                    conditions.append(FieldCondition(key=k, match=MatchValue(value=v)))
-            qdrant_filter = Filter(must=conditions)
-
         results = self.client.query_points(
             collection_name=self.collection_name,
             query=vector,
