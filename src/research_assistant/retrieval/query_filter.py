@@ -26,7 +26,7 @@ aren't mentioned.
 start and/or end. Both are inclusive. Examples:
   - "FY2023" / "in 2024" -> start=2023, end=2023 (or 2024)
   - "FY2022 to FY2024" -> start=2022, end=2024
-  - "FY2022 and FY2024" -> start=2022, end=2024
+  - "FY2022 and FY2024" -> start=2022, end=2024 (fills gap — includes 2023)
   - "since 2022" / "from 2022 onwards" -> start=2022, end=null
   - "up to 2024" / "before 2025" -> start=null, end=2024
   - "last 3 years" / "past 3 years" -> start={current_year} - 3 + 1, end={current_year}
@@ -134,7 +134,7 @@ class QueryFilterExtractor:
         fiscal_years: set[int] = set()
 
         if entities.year_range:
-            valid_years = self._get_valid_years(tickers)
+            valid_years = self._get_valid_years()
             fiscal_years.update(entities.year_range.expand(valid_years))
         elif entities.latest and tickers:
             for ticker in tickers:
@@ -144,7 +144,7 @@ class QueryFilterExtractor:
 
         return QueryFilters(tickers=tickers, fiscal_years=sorted(fiscal_years))
 
-    def _get_valid_years(self, tickers: list[str]) -> set[int]:
+    def _get_valid_years(self) -> set[int]:
         hits = self._store.get_field_values("fiscal_year")
         return {int(h.value) for h in hits}
 

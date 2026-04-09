@@ -88,11 +88,11 @@ class QdrantStore:
                 collection_name=self.collection_name,
                 vectors_config=VectorParams(size=self.vector_dim, distance=Distance.COSINE),
             )
-        self.client.create_payload_index(
-            collection_name=self.collection_name,
-            field_name="fiscal_year",
-            field_schema=PayloadSchemaType.INTEGER,
-        )
+            self.client.create_payload_index(
+                collection_name=self.collection_name,
+                field_name="fiscal_year",
+                field_schema=PayloadSchemaType.INTEGER,
+            )
 
     def upsert(self, chunks: list[Chunk], vectors: list[list[float]]) -> None:
         points = [
