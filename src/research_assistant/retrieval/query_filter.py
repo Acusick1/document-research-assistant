@@ -35,8 +35,12 @@ start and/or end. Both are inclusive. Examples:
 - **latest**: Set to true if the query asks for the most recent data without specifying a year \
 (e.g. "latest revenue", "most recent filing", "current net income"). \
 Do not set latest if a year_range is provided.
-
-If the query doesn't mention any companies or years, return empty values.\
+- **reject_reason**: If the query is not a valid financial question, set this to a short \
+explanation. Examples of invalid queries:
+  - Gibberish or random text -> "Query is not a valid question."
+  - Off-topic (not about financial data) -> "Question is outside the scope of financial filings."
+  - Completely ambiguous with no actionable intent -> "Query is too vague to process."
+  Leave null for valid financial queries, even if the answer might not be in the corpus.\
 """
 
 
@@ -69,11 +73,20 @@ class ExtractedEntities(BaseModel):
         default=False,
         description="True if the query asks for the most recent data without a specific year",
     )
+    reject_reason: str | None = Field(
+        default=None,
+        description="Reason the query was rejected, or null if valid",
+    )
 
 
 class QueryFilters(BaseModel):
     tickers: list[str] = Field(default_factory=list)
     fiscal_years: list[int] = Field(default_factory=list)
+
+
+class FilterResult(BaseModel):
+    filters: dict[str, Any] = Field(default_factory=dict)
+    reject_reason: str | None = None
 
 
 class QueryFilterExtractor:
@@ -111,18 +124,22 @@ class QueryFilterExtractor:
         logger.info("Built name->ticker mapping: %s", mapping)
         return mapping
 
-    async def extract(self, query: str) -> dict[str, Any]:
+    async def extract(self, query: str) -> FilterResult:
         try:
             result = await self._agent.run(query)
         except Exception:
             logger.exception("Filter extraction failed, falling back to unfiltered: %r", query)
-            return {}
+            return FilterResult()
         entities = result.output
         logger.debug("Extracted entities: %s", entities)
 
+        if entities.reject_reason:
+            logger.info("Query rejected: %r -> %s", query, entities.reject_reason)
+            return FilterResult(reject_reason=entities.reject_reason)
+
         filters = self._resolve(entities)
         logger.info("Query: %r -> filters: %s", query, filters)
-        return self._to_qdrant_filters(filters)
+        return FilterResult(filters=self._to_qdrant_filters(filters))
 
     def _resolve(self, entities: ExtractedEntities) -> QueryFilters:
         tickers: list[str] = []

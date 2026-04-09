@@ -51,10 +51,15 @@ class RagPipeline:
         self._max_tokens = settings.max_tokens
 
     async def __call__(self, eval_input: EvalInput) -> EvalOutput:
-        filters = await self._filter_extractor.extract(eval_input.query)
+        filter_result = await self._filter_extractor.extract(eval_input.query)
+        if filter_result.reject_reason:
+            return EvalOutput(answer=filter_result.reject_reason, sources=[])
+
         query_vector = self._embedder.embed([eval_input.query])[0].tolist()
         search_top_k = self._rerank_top_k if self._reranker else self._top_k
-        results = self._store.search(query_vector, top_k=search_top_k, filters=filters)
+        results = self._store.search(
+            query_vector, top_k=search_top_k, filters=filter_result.filters,
+        )
         if self._reranker:
             results = self._reranker.rerank(eval_input.query, results, top_k=self._top_k)
 

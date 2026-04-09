@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from unittest.mock import MagicMock
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
@@ -170,6 +170,52 @@ class TestResolve:
         entities = ExtractedEntities(companies=["Google"])
         result = extractor._resolve(entities)
         assert result.tickers == ["GOOGL"]
+
+
+class TestExtract:
+    @pytest.fixture
+    def extractor(self) -> QueryFilterExtractor:
+        extractor = object.__new__(QueryFilterExtractor)
+        extractor._name_to_ticker = {"aapl": "AAPL"}
+        store = MagicMock()
+        store.get_field_values.return_value = [MagicMock(value=2025)]
+        extractor._store = store
+        extractor._agent = AsyncMock()
+        return extractor
+
+    @pytest.mark.anyio
+    async def test_rejected_query(self, extractor: QueryFilterExtractor) -> None:
+        mock_result = MagicMock()
+        mock_result.output = ExtractedEntities(
+            reject_reason="Question is outside the scope of SEC financial filings.",
+        )
+        extractor._agent.run.return_value = mock_result
+
+        result = await extractor.extract("What is the capital of France?")
+        assert result.reject_reason == "Question is outside the scope of SEC financial filings."
+        assert result.filters == {}
+
+    @pytest.mark.anyio
+    async def test_valid_query(self, extractor: QueryFilterExtractor) -> None:
+        mock_result = MagicMock()
+        mock_result.output = ExtractedEntities(
+            companies=["AAPL"], year_range=YearRange(start=2025, end=2025),
+        )
+        extractor._agent.run.return_value = mock_result
+
+        result = await extractor.extract("What was Apple's revenue in FY2025?")
+        assert result.reject_reason is None
+        assert result.filters == {"ticker": "AAPL", "fiscal_year": 2025}
+
+    @pytest.mark.anyio
+    async def test_agent_failure_returns_empty(
+        self, extractor: QueryFilterExtractor,
+    ) -> None:
+        extractor._agent.run.side_effect = RuntimeError("LLM error")
+
+        result = await extractor.extract("some query")
+        assert result.reject_reason is None
+        assert result.filters == {}
 
 
 class TestToQdrantFilters:
