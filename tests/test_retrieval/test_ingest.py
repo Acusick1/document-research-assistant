@@ -36,7 +36,7 @@ def chunks() -> list[Chunk]:
         ticker="AAPL",
         company_name="Apple Inc.",
         filing_type="10-K",
-        period="FY2024",
+        fiscal_year=2024,
         section_name="Item 1",
         filing_date=date(2024, 11, 1),
     )

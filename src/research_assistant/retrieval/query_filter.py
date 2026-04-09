@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from datetime import date
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -11,20 +12,48 @@ from research_assistant.retrieval.vector_store import QdrantStore
 
 logger = logging.getLogger(__name__)
 
-FILTER_EXTRACTION_PROMPT = """\
+FILTER_EXTRACTION_PROMPT_TEMPLATE = """\
 You are a query preprocessor for a financial document search system. Your job is to extract \
 structured entities from a user's natural language query.
+
+The current fiscal year is {current_year}.
 
 Extract:
 - **companies**: Any company names or ticker symbols mentioned. Output them exactly as they \
 appear in the query (e.g. "Apple", "MSFT", "Alphabet"). Do not guess or infer companies that \
 aren't mentioned.
-- **years**: Any fiscal years mentioned. Extract as integers (e.g. "FY2023" -> 2023, \
-"in 2024" -> 2024, "last year" -> leave empty unless the exact year is clear). \
-Only extract years you are confident about.
+- **year_range**: The fiscal year or years the query refers to, expressed as a range with \
+start and/or end. Both are inclusive. Examples:
+  - "FY2023" / "in 2024" -> start=2023, end=2023 (or 2024)
+  - "FY2022 to FY2024" -> start=2022, end=2024
+  - "FY2022 and FY2024" -> start=2022, end=2024
+  - "since 2022" / "from 2022 onwards" -> start=2022, end=null
+  - "up to 2024" / "before 2025" -> start=null, end=2024
+  - "last 3 years" / "past 3 years" -> start={current_year} - 3 + 1, end={current_year}
+  - "over the past 5 years" -> start={current_year} - 5 + 1, end={current_year}
+  Leave null if no year information is mentioned or implied.
+- **latest**: Set to true if the query asks for the most recent data without specifying a year \
+(e.g. "latest revenue", "most recent filing", "current net income"). \
+Do not set latest if a year_range is provided.
 
-If the query doesn't mention any companies or years, return empty lists.\
+If the query doesn't mention any companies or years, return empty values.\
 """
+
+
+class YearRange(BaseModel):
+    start: int | None = Field(
+        default=None, description="Start year of the range (inclusive)",
+    )
+    end: int | None = Field(
+        default=None, description="End year of the range (inclusive)",
+    )
+
+    def expand(self, valid_years: set[int]) -> list[int]:
+        lo = self.start if self.start is not None else min(valid_years, default=None)
+        hi = self.end if self.end is not None else max(valid_years, default=None)
+        if lo is None or hi is None or lo > hi:
+            return []
+        return list(range(lo, hi + 1))
 
 
 class ExtractedEntities(BaseModel):
@@ -32,33 +61,37 @@ class ExtractedEntities(BaseModel):
         default_factory=list,
         description="Company names or ticker symbols as they appear in the query",
     )
-    years: list[int] = Field(
-        default_factory=list,
-        description="Fiscal years mentioned in the query as integers",
+    year_range: YearRange | None = Field(
+        default=None,
+        description="Fiscal year(s) as a range (start and end inclusive, either may be null)",
+    )
+    latest: bool = Field(
+        default=False,
+        description="True if the query asks for the most recent data without a specific year",
     )
 
 
 class QueryFilters(BaseModel):
     tickers: list[str] = Field(default_factory=list)
-    periods: list[str] = Field(default_factory=list)
+    fiscal_years: list[int] = Field(default_factory=list)
 
 
 class QueryFilterExtractor:
     def __init__(self, store: QdrantStore, model: str) -> None:
+        prompt = FILTER_EXTRACTION_PROMPT_TEMPLATE.format(current_year=date.today().year)
         self._agent: Agent[None, ExtractedEntities] = Agent(
             model,
-            system_prompt=FILTER_EXTRACTION_PROMPT,
+            system_prompt=prompt,
             output_type=ExtractedEntities,
         )
+        self._store = store
         self._name_to_ticker = self._build_name_mapping(store)
-        self._valid_periods = self._load_valid_periods(store)
 
     def _build_name_mapping(self, store: QdrantStore) -> dict[str, str]:
         mapping: dict[str, str] = {}
         ticker_hits = store.get_field_values("ticker")
         tickers = [str(h.value) for h in ticker_hits]
 
-        # One scroll per ticker to pair ticker → company_name (N+1, fine for small corpus)
         for ticker in tickers:
             mapping[ticker.lower()] = ticker
 
@@ -77,12 +110,6 @@ class QueryFilterExtractor:
 
         logger.info("Built name->ticker mapping: %s", mapping)
         return mapping
-
-    def _load_valid_periods(self, store: QdrantStore) -> set[str]:
-        hits = store.get_field_values("period")
-        periods = {str(h.value) for h in hits}
-        logger.info("Valid periods: %s", periods)
-        return periods
 
     async def extract(self, query: str) -> dict[str, Any]:
         try:
@@ -104,13 +131,22 @@ class QueryFilterExtractor:
             if ticker and ticker not in tickers:
                 tickers.append(ticker)
 
-        periods: list[str] = []
-        for year in entities.years:
-            period = f"FY{year}"
-            if period in self._valid_periods and period not in periods:
-                periods.append(period)
+        fiscal_years: set[int] = set()
 
-        return QueryFilters(tickers=tickers, periods=periods)
+        if entities.year_range:
+            valid_years = self._get_valid_years(tickers)
+            fiscal_years.update(entities.year_range.expand(valid_years))
+        elif entities.latest and tickers:
+            for ticker in tickers:
+                latest = self._store.get_latest_fiscal_year(ticker)
+                if latest is not None:
+                    fiscal_years.add(latest)
+
+        return QueryFilters(tickers=tickers, fiscal_years=sorted(fiscal_years))
+
+    def _get_valid_years(self, tickers: list[str]) -> set[int]:
+        hits = self._store.get_field_values("fiscal_year")
+        return {int(h.value) for h in hits}
 
     def _match_ticker(self, company: str) -> str | None:
         key = company.strip().lower()
@@ -118,7 +154,6 @@ class QueryFilterExtractor:
         if key in self._name_to_ticker:
             return self._name_to_ticker[key]
 
-        # Substring match (bidirectional), longest match wins to avoid short-string ambiguity
         best_match: str | None = None
         best_len = 0
         for name, ticker in self._name_to_ticker.items():
@@ -137,8 +172,8 @@ class QueryFilterExtractor:
             result["ticker"] = filters.tickers[0]
         elif len(filters.tickers) > 1:
             result["ticker"] = filters.tickers
-        if len(filters.periods) == 1:
-            result["period"] = filters.periods[0]
-        elif len(filters.periods) > 1:
-            result["period"] = filters.periods
+        if len(filters.fiscal_years) == 1:
+            result["fiscal_year"] = filters.fiscal_years[0]
+        elif len(filters.fiscal_years) > 1:
+            result["fiscal_year"] = filters.fiscal_years
         return result

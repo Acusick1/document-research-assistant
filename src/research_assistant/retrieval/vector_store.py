@@ -6,12 +6,15 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import FacetValueHit
+from qdrant_client.http.models.models import Direction
 from qdrant_client.models import (
     Distance,
     FieldCondition,
     Filter,
     MatchAny,
     MatchValue,
+    OrderBy,
+    PayloadSchemaType,
     PointStruct,
     VectorParams,
 )
@@ -30,7 +33,7 @@ class ChunkPayload(BaseModel):
     chunk_index: int
     ticker: str
     company_name: str
-    period: str
+    fiscal_year: int
     filing_type: str
     source: str
 
@@ -85,6 +88,11 @@ class QdrantStore:
                 collection_name=self.collection_name,
                 vectors_config=VectorParams(size=self.vector_dim, distance=Distance.COSINE),
             )
+        self.client.create_payload_index(
+            collection_name=self.collection_name,
+            field_name="fiscal_year",
+            field_schema=PayloadSchemaType.INTEGER,
+        )
 
     def upsert(self, chunks: list[Chunk], vectors: list[list[float]]) -> None:
         points = [
@@ -125,6 +133,20 @@ class QdrantStore:
             for point in results.points
             if point.payload
         ]
+
+    def get_latest_fiscal_year(self, ticker: str) -> int | None:
+        points, _ = self.client.scroll(
+            collection_name=self.collection_name,
+            scroll_filter=Filter(
+                must=[FieldCondition(key="ticker", match=MatchValue(value=ticker))]
+            ),
+            order_by=OrderBy(key="fiscal_year", direction=Direction.DESC),
+            limit=1,
+            with_payload=["fiscal_year"],
+        )
+        if points and points[0].payload:
+            return int(points[0].payload["fiscal_year"])
+        return None
 
     def get_field_values(self, field: str, limit: int = 100) -> list[FacetValueHit]:
         response = self.client.facet(

@@ -36,7 +36,7 @@ cases:
     answer: "Microsoft typically has the highest gross margin driven by software/cloud mix. Apple's hardware-heavy mix produces lower margins. Alphabet falls between, with high-margin ad revenue offset by cloud and hardware investments."
 - name: rd_intensity_and_strategy
   inputs:
-    query: Which of the big tech companies (Apple, Microsoft, Alphabet, Amazon, Meta) spends the most on R&D as a percentage of revenue, and how does each company describe its R&D strategy in their 10-K?
+    query: Among the big tech companies (Apple, Microsoft, Alphabet, Amazon, Meta), who spends the most on R&D as a percentage of revenue based on their latest filings, and how does each describe its R&D strategy?
   metadata:
     category: multihop
     companies:

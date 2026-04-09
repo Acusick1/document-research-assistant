@@ -14,7 +14,7 @@ _PAYLOAD = {
     "chunk_index": 0,
     "ticker": "AAPL",
     "company_name": "Apple",
-    "period": "FY2025",
+    "fiscal_year": 2025,
     "filing_type": "10-K",
     "source": "edgar",
 }

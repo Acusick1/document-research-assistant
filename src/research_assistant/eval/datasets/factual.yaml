@@ -3,7 +3,7 @@ name: factual
 cases:
 - name: aapl_revenue_fy2025
   inputs:
-    query: What was Apple Inc.'s total revenue in FY2025?
+    query: What is Apple's latest reported revenue?
   metadata:
     category: factual
     company: AAPL
@@ -87,7 +87,7 @@ cases:
   evaluators: []
 - name: aapl_gross_profit_fy2025
   inputs:
-    query: What was Apple Inc.'s gross profit in FY2025?
+    query: How much gross profit did Apple make last year?
   metadata:
     category: factual
     company: AAPL
@@ -269,7 +269,7 @@ cases:
   evaluators: []
 - name: msft_operating_cash_flow_fy2025
   inputs:
-    query: What was MICROSOFT CORP's operating cash flow in FY2025?
+    query: What was Microsoft's most recent operating cash flow?
   metadata:
     category: factual
     company: MSFT
@@ -647,7 +647,7 @@ cases:
   evaluators: []
 - name: nvda_net_income_fy2026
   inputs:
-    query: What was NVIDIA CORP's net income in FY2026?
+    query: How much did NVIDIA earn last year?
   metadata:
     category: factual
     company: NVDA
