@@ -9,6 +9,6 @@ class EdgarMetadata(Metadata):
     ticker: str
     company_name: str
     filing_type: str
-    period: str
+    fiscal_year: int
     section_name: str
     filing_date: date

@@ -80,7 +80,7 @@ class EdgarParser:
             ticker=ticker.upper(),
             company_name=company_name,
             filing_type="10-K",
-            period=f"FY{year}",
+            fiscal_year=year,
             section_name="",
             filing_date=filing_date,
         )

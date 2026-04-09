@@ -24,13 +24,13 @@ def _format_context(results: list[SearchResult]) -> str:
         return "(No relevant documents found)"
     parts: list[str] = []
     for i, r in enumerate(results, 1):
-        header = f"[{i}] {r.ticker} {r.period} — {r.section_name} (score: {r.score:.3f})"
+        header = f"[{i}] {r.ticker} FY{r.fiscal_year} — {r.section_name} (score: {r.score:.3f})"
         parts.append(f"{header}\n{r.text}")
     return "\n\n---\n\n".join(parts)
 
 
 def _sources_from_results(results: list[SearchResult]) -> list[str]:
-    return [f"[{r.ticker} {r.period} {r.section_name}] {r.text[:200]}" for r in results]
+    return [f"[{r.ticker} FY{r.fiscal_year} {r.section_name}] {r.text[:200]}" for r in results]
 
 
 class RagPipeline:

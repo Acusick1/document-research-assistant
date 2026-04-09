@@ -3,8 +3,7 @@ name: comparison
 cases:
 - name: aapl_vs_msft_revenue
   inputs:
-    query: Which company had higher total revenue, Apple Inc. (FY2025) or MICROSOFT
-      CORP (FY2025)?
+    query: Between Apple and Microsoft, which had higher revenue in their most recent fiscal year?
   metadata:
     category: comparison
     company: AAPL
@@ -258,8 +257,7 @@ cases:
   evaluators: []
 - name: aapl_vs_googl_research_and_development
   inputs:
-    query: Which company had higher R&D spending, Apple Inc. (FY2025) or Alphabet
-      Inc. (FY2025)?
+    query: Does Apple or Alphabet spend more on R&D?
   metadata:
     category: comparison
     company: GOOGL
@@ -309,8 +307,7 @@ cases:
   evaluators: []
 - name: aapl_vs_msft_operating_cash_flow
   inputs:
-    query: Which company had higher operating cash flow, Apple Inc. (FY2025) or MICROSOFT
-      CORP (FY2025)?
+    query: Who generates more operating cash flow, Apple or Microsoft?
   metadata:
     category: comparison
     company: MSFT

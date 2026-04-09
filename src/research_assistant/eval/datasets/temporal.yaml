@@ -13,7 +13,7 @@ report_evaluators: []
 cases:
 - name: apple_revenue_trend_3y
   inputs:
-    query: How did Apple's total revenue change from FY2022 to FY2024?
+    query: How has Apple's revenue trended since FY2022?
   metadata:
     category: temporal
     company: AAPL
@@ -22,7 +22,7 @@ cases:
     answer: "Apple's revenue decreased from ~$394B in FY2022 to ~$383B in FY2023, then recovered to ~$391B in FY2024"
 - name: msft_rd_trend
   inputs:
-    query: What was the trend in Microsoft's R&D spending from FY2022 to FY2024?
+    query: How has Microsoft's R&D spending changed in recent years?
   metadata:
     category: temporal
     company: MSFT
@@ -31,7 +31,7 @@ cases:
     answer: "Microsoft's R&D spending increased consistently year over year from FY2022 to FY2024"
 - name: nvda_revenue_growth
   inputs:
-    query: How did NVIDIA's revenue grow from FY2023 to FY2025?
+    query: What has NVIDIA's revenue growth looked like over the past 3 years?
   metadata:
     category: temporal
     company: NVDA
