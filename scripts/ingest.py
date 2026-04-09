@@ -25,6 +25,9 @@ def main() -> None:
     parser.add_argument(
         "--no-cache", action="store_true", help="Bypass the disk cache for EDGAR API responses"
     )
+    parser.add_argument(
+        "--fresh", action="store_true", help="Delete and recreate the collection before ingesting"
+    )
     args = parser.parse_args()
 
     settings = Settings()
@@ -37,6 +40,9 @@ def main() -> None:
     embedder = FastEmbedEmbedder(model_name=settings.embedding_model)
     client = create_qdrant_client(settings)
     store = QdrantStore(client, settings.collection_name, embedder.dim)
+    if args.fresh:
+        logger.info("Deleting collection '%s' for fresh ingestion", settings.collection_name)
+        client.delete_collection(settings.collection_name)
     store.ensure_collection()
 
     total_chunks = 0
