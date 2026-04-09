@@ -2,7 +2,11 @@ from __future__ import annotations
 
 from datetime import date
 
-from research_assistant.corpus.edgar.chunker import EdgarChunker, _build_context_prefix
+from research_assistant.corpus.edgar.chunker import (
+    CONTEXT_PREFIX_TOKEN_BUDGET,
+    EdgarChunker,
+    _build_context_prefix,
+)
 from research_assistant.corpus.edgar.metadata import EdgarMetadata
 from research_assistant.corpus.models import Document
 
@@ -62,12 +66,17 @@ class TestEdgarChunker:
             metadata=meta,
             raw_text=long_text,
         )
-        chunker = EdgarChunker(max_tokens=512, tokenizer="character")
+        max_tokens = 512
+        content_budget = max_tokens - CONTEXT_PREFIX_TOKEN_BUDGET
+        chunker = EdgarChunker(max_tokens=max_tokens, tokenizer="character")
         chunks = chunker.chunk(doc)
         assert len(chunks) > 1
+        prefix = _build_context_prefix(meta, "Item 1")
         for chunk in chunks:
             assert chunk.section_name == "Item 1"
             assert chunk.document_id == "test"
+            content = chunk.text.removeprefix(prefix)
+            assert len(content) <= content_budget
 
     def test_chunk_ids_are_unique(self, sample_document: Document) -> None:
         chunker = EdgarChunker(max_tokens=5000, tokenizer="character")

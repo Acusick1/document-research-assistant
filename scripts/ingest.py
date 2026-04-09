@@ -36,7 +36,7 @@ def main() -> None:
 
     cache = None if args.no_cache else create_cache(settings.cache_dir)
     edgar_parser = EdgarParser(identity=args.identity, cache=cache)
-    chunker = EdgarChunker(max_tokens=settings.chunk_max_tokens)
+    chunker = EdgarChunker(max_tokens=settings.chunk_max_tokens, tokenizer=settings.embedding_model)
     embedder = FastEmbedEmbedder(model_name=settings.embedding_model)
     client = create_qdrant_client(settings)
     store = QdrantStore(client, settings.collection_name, embedder.dim)

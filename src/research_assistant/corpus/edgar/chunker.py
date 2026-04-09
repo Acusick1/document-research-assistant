@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import hashlib
+import logging
 
 from chonkie import RecursiveChunker
 
 from research_assistant.corpus.edgar.metadata import EdgarMetadata
 from research_assistant.corpus.models import Chunk, Document
+
+logger = logging.getLogger(__name__)
 
 SECTION_LABELS: dict[str, str] = {
     "Item 1": "Business",
@@ -30,6 +33,8 @@ SECTION_LABELS: dict[str, str] = {
     "Item 15": "Exhibits and Financial Statements",
 }
 
+CONTEXT_PREFIX_TOKEN_BUDGET = 30
+
 
 def _build_context_prefix(metadata: EdgarMetadata, section_name: str) -> str:
     label = SECTION_LABELS.get(section_name, "")
@@ -41,15 +46,8 @@ def _build_context_prefix(metadata: EdgarMetadata, section_name: str) -> str:
     )
 
 
-CONTEXT_PREFIX_TOKEN_BUDGET = 30
-
-
 class EdgarChunker:
-    def __init__(
-        self,
-        max_tokens: int = 512,
-        tokenizer: str = "BAAI/bge-small-en-v1.5",
-    ) -> None:
+    def __init__(self, max_tokens: int = 512, tokenizer: str = "character") -> None:
         self.max_tokens = max_tokens
         self._chunker = RecursiveChunker(
             tokenizer=tokenizer,
@@ -65,6 +63,14 @@ class EdgarChunker:
 
         for section_name, text in document.sections.items():
             prefix = _build_context_prefix(base_metadata, section_name)
+            prefix_tokens = self._chunker._tokenizer.count_tokens(prefix)
+            if prefix_tokens > CONTEXT_PREFIX_TOKEN_BUDGET:
+                logger.warning(
+                    "Context prefix for %s %s exceeds budget (%d > %d tokens): %r",
+                    base_metadata.ticker, section_name,
+                    prefix_tokens, CONTEXT_PREFIX_TOKEN_BUDGET, prefix,
+                )
+
             chonkie_chunks = self._chunker.chunk(text)
 
             for cc in chonkie_chunks:
