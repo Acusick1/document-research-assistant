@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import uuid
-from typing import Any
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from research_assistant.retrieval.query_filter import QueryFilters
 
 from pydantic import BaseModel, ConfigDict
 from qdrant_client import QdrantClient
@@ -109,17 +112,33 @@ class QdrantStore:
         self,
         vector: list[float],
         top_k: int = 5,
-        filters: dict[str, Any] | None = None,
+        filters: QueryFilters | None = None,
     ) -> list[SearchResult]:
         qdrant_filter = None
         if filters:
-            conditions = []
-            for k, v in filters.items():
-                if isinstance(v, list):
-                    conditions.append(FieldCondition(key=k, match=MatchAny(any=v)))
-                else:
-                    conditions.append(FieldCondition(key=k, match=MatchValue(value=v)))
-            qdrant_filter = Filter(must=conditions)
+            conditions: list[FieldCondition] = []
+            if len(filters.tickers) == 1:
+                conditions.append(
+                    FieldCondition(key="ticker", match=MatchValue(value=filters.tickers[0]))
+                )
+            elif len(filters.tickers) > 1:
+                conditions.append(
+                    FieldCondition(key="ticker", match=MatchAny(any=filters.tickers))
+                )
+            if len(filters.fiscal_years) == 1:
+                conditions.append(
+                    FieldCondition(
+                        key="fiscal_year", match=MatchValue(value=filters.fiscal_years[0]),
+                    )
+                )
+            elif len(filters.fiscal_years) > 1:
+                conditions.append(
+                    FieldCondition(
+                        key="fiscal_year", match=MatchAny(any=filters.fiscal_years),
+                    )
+                )
+            if conditions:
+                qdrant_filter = Filter(must=conditions)
 
         results = self.client.query_points(
             collection_name=self.collection_name,

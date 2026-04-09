@@ -4,6 +4,7 @@ import pytest
 from qdrant_client import QdrantClient
 
 from research_assistant.corpus.models import Chunk
+from research_assistant.retrieval.query_filter import QueryFilters
 from research_assistant.retrieval.vector_store import QdrantStore
 
 
@@ -44,7 +45,7 @@ def sample_chunks_with_vectors() -> tuple[list[Chunk], list[list[float]]]:
             document_id="doc1",
             text="Revenue was $391 billion",
             section_name="Item 7",
-            metadata=meta.model_copy(update={"section_name": "Item 7"}),
+            metadata=meta.model_copy(update={"section_name": "Item 7", "fiscal_year": 2025}),
             chunk_index=1,
         ),
     ]
@@ -94,7 +95,7 @@ class TestQdrantStore:
         results = store.search(
             [0.5, 0.5, 0.0, 0.0],
             top_k=2,
-            filters={"section_name": "Item 7"},
+            filters=QueryFilters(tickers=["AAPL"], fiscal_years=[2025]),
         )
         assert len(results) == 1
-        assert results[0].section_name == "Item 7"
+        assert results[0].fiscal_year == 2025

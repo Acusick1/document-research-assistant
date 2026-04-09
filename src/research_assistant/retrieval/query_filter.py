@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 from datetime import date
-from typing import Any
 
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent
@@ -85,7 +84,7 @@ class QueryFilters(BaseModel):
 
 
 class FilterResult(BaseModel):
-    filters: dict[str, Any] = Field(default_factory=dict)
+    query_filters: QueryFilters = Field(default_factory=QueryFilters)
     reject_reason: str | None = None
 
 
@@ -137,9 +136,9 @@ class QueryFilterExtractor:
             logger.info("Query rejected: %r -> %s", query, entities.reject_reason)
             return FilterResult(reject_reason=entities.reject_reason)
 
-        filters = self._resolve(entities)
-        logger.info("Query: %r -> filters: %s", query, filters)
-        return FilterResult(filters=self._to_qdrant_filters(filters))
+        query_filters = self._resolve(entities)
+        logger.info("Query: %r -> filters: %s", query, query_filters)
+        return FilterResult(query_filters=query_filters)
 
     def _resolve(self, entities: ExtractedEntities) -> QueryFilters:
         tickers: list[str] = []
@@ -183,14 +182,3 @@ class QueryFilterExtractor:
         logger.warning("Could not resolve company %r to a ticker", company)
         return None
 
-    def _to_qdrant_filters(self, filters: QueryFilters) -> dict[str, Any]:
-        result: dict[str, Any] = {}
-        if len(filters.tickers) == 1:
-            result["ticker"] = filters.tickers[0]
-        elif len(filters.tickers) > 1:
-            result["ticker"] = filters.tickers
-        if len(filters.fiscal_years) == 1:
-            result["fiscal_year"] = filters.fiscal_years[0]
-        elif len(filters.fiscal_years) > 1:
-            result["fiscal_year"] = filters.fiscal_years
-        return result
