@@ -10,15 +10,22 @@ from qdrant_client.models import (
     Distance,
     FieldCondition,
     Filter,
+    Fusion,
+    FusionQuery,
     MatchValue,
+    Modifier,
     OrderBy,
     PayloadSchemaType,
     PointStruct,
+    Prefetch,
+    SparseVectorParams,
     VectorParams,
 )
+from qdrant_client.models import SparseVector as QdrantSparseVector
 
 from research_assistant.config import Settings
 from research_assistant.corpus.models import Chunk
+from research_assistant.retrieval.embeddings import SparseVector
 
 
 class ChunkPayload(BaseModel):
@@ -74,17 +81,31 @@ def create_qdrant_client(settings: Settings) -> QdrantClient:
 
 
 class QdrantStore:
-    def __init__(self, client: QdrantClient, collection_name: str, vector_dim: int) -> None:
+    def __init__(
+        self,
+        client: QdrantClient,
+        collection_name: str,
+        vector_dim: int,
+        *,
+        enable_sparse: bool = False,
+    ) -> None:
         self.client = client
         self.collection_name = collection_name
         self.vector_dim = vector_dim
+        self.enable_sparse = enable_sparse
 
     def ensure_collection(self) -> None:
         collections = [c.name for c in self.client.get_collections().collections]
         if self.collection_name not in collections:
+            sparse_config = (
+                {"sparse": SparseVectorParams(modifier=Modifier.IDF)}
+                if self.enable_sparse
+                else None
+            )
             self.client.create_collection(
                 collection_name=self.collection_name,
-                vectors_config=VectorParams(size=self.vector_dim, distance=Distance.COSINE),
+                vectors_config={"dense": VectorParams(size=self.vector_dim, distance=Distance.COSINE)},
+                sparse_vectors_config=sparse_config,
             )
             self.client.create_payload_index(
                 collection_name=self.collection_name,
@@ -92,15 +113,25 @@ class QdrantStore:
                 field_schema=PayloadSchemaType.INTEGER,
             )
 
-    def upsert(self, chunks: list[Chunk], vectors: list[list[float]]) -> None:
-        points = [
-            PointStruct(
-                id=_str_to_uuid(chunk.id),
-                vector=vector,
-                payload=ChunkPayload.from_chunk(chunk).model_dump(mode="json"),
+    def upsert(
+        self,
+        chunks: list[Chunk],
+        vectors: list[list[float]],
+        sparse_vectors: list[SparseVector] | None = None,
+    ) -> None:
+        points: list[PointStruct] = []
+        for i, (chunk, vector) in enumerate(zip(chunks, vectors, strict=True)):
+            vec_dict: dict[str, list[float] | QdrantSparseVector] = {"dense": vector}
+            if sparse_vectors is not None:
+                sv = sparse_vectors[i]
+                vec_dict["sparse"] = QdrantSparseVector(indices=sv.indices, values=sv.values)
+            points.append(
+                PointStruct(
+                    id=_str_to_uuid(chunk.id),
+                    vector=vec_dict,
+                    payload=ChunkPayload.from_chunk(chunk).model_dump(mode="json"),
+                )
             )
-            for chunk, vector in zip(chunks, vectors, strict=True)
-        ]
         self.client.upsert(collection_name=self.collection_name, points=points)
 
     def search(
@@ -108,13 +139,40 @@ class QdrantStore:
         vector: list[float],
         top_k: int = 5,
         qdrant_filter: Filter | None = None,
+        *,
+        sparse_vector: SparseVector | None = None,
+        prefetch_limit: int = 50,
     ) -> list[SearchResult]:
-        results = self.client.query_points(
-            collection_name=self.collection_name,
-            query=vector,
-            limit=top_k,
-            query_filter=qdrant_filter,
-        )
+        if sparse_vector is not None and self.enable_sparse:
+            results = self.client.query_points(
+                collection_name=self.collection_name,
+                prefetch=[
+                    Prefetch(
+                        query=QdrantSparseVector(
+                            indices=sparse_vector.indices, values=sparse_vector.values,
+                        ),
+                        using="sparse",
+                        limit=prefetch_limit,
+                        filter=qdrant_filter,
+                    ),
+                    Prefetch(
+                        query=vector,
+                        using="dense",
+                        limit=prefetch_limit,
+                        filter=qdrant_filter,
+                    ),
+                ],
+                query=FusionQuery(fusion=Fusion.RRF),
+                limit=top_k,
+            )
+        else:
+            results = self.client.query_points(
+                collection_name=self.collection_name,
+                query=vector,
+                using="dense",
+                limit=top_k,
+                query_filter=qdrant_filter,
+            )
 
         return [
             SearchResult(id=str(point.id), score=point.score, **point.payload)

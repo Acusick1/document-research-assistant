@@ -79,7 +79,7 @@ class FakeEmbedder:
 class TestRagPipeline:
     @pytest.fixture
     def settings(self) -> Settings:
-        return Settings(qdrant_mode="memory", top_k=2)
+        return Settings(qdrant_mode="memory", top_k=2, sparse_model=None)
 
     @pytest.fixture
     def populated_store(self) -> QdrantStore:

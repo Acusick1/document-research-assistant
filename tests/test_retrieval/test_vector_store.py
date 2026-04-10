@@ -5,6 +5,7 @@ from qdrant_client import QdrantClient
 from qdrant_client.models import FieldCondition, Filter, MatchValue
 
 from research_assistant.corpus.models import Chunk
+from research_assistant.retrieval.embeddings import SparseVector
 from research_assistant.retrieval.vector_store import QdrantStore
 
 
@@ -17,7 +18,15 @@ def store() -> QdrantStore:
 
 
 @pytest.fixture
-def sample_chunks_with_vectors() -> tuple[list[Chunk], list[list[float]]]:
+def sparse_store() -> QdrantStore:
+    client = QdrantClient(":memory:")
+    s = QdrantStore(client, "test_collection", vector_dim=4, enable_sparse=True)
+    s.ensure_collection()
+    return s
+
+
+@pytest.fixture
+def sample_chunks_with_vectors() -> tuple[list[Chunk], list[list[float]], list[SparseVector]]:
     from datetime import date
 
     from research_assistant.corpus.edgar.metadata import EdgarMetadata
@@ -50,7 +59,11 @@ def sample_chunks_with_vectors() -> tuple[list[Chunk], list[list[float]]]:
         ),
     ]
     vectors = [[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0]]
-    return chunks, vectors
+    sparse_vectors = [
+        SparseVector(indices=[0, 1], values=[0.5, 0.3]),
+        SparseVector(indices=[1, 2], values=[0.7, 0.2]),
+    ]
+    return chunks, vectors, sparse_vectors
 
 
 class TestQdrantStore:
@@ -66,18 +79,18 @@ class TestQdrantStore:
     def test_upsert_and_count(
         self,
         store: QdrantStore,
-        sample_chunks_with_vectors: tuple[list[Chunk], list[list[float]]],
+        sample_chunks_with_vectors: tuple[list[Chunk], list[list[float]], list[SparseVector]],
     ) -> None:
-        chunks, vectors = sample_chunks_with_vectors
+        chunks, vectors, _ = sample_chunks_with_vectors
         store.upsert(chunks, vectors)
         assert store.count() == 2
 
     def test_search(
         self,
         store: QdrantStore,
-        sample_chunks_with_vectors: tuple[list[Chunk], list[list[float]]],
+        sample_chunks_with_vectors: tuple[list[Chunk], list[list[float]], list[SparseVector]],
     ) -> None:
-        chunks, vectors = sample_chunks_with_vectors
+        chunks, vectors, _ = sample_chunks_with_vectors
         store.upsert(chunks, vectors)
 
         results = store.search([1.0, 0.0, 0.0, 0.0], top_k=1)
@@ -87,9 +100,9 @@ class TestQdrantStore:
     def test_search_with_filter(
         self,
         store: QdrantStore,
-        sample_chunks_with_vectors: tuple[list[Chunk], list[list[float]]],
+        sample_chunks_with_vectors: tuple[list[Chunk], list[list[float]], list[SparseVector]],
     ) -> None:
-        chunks, vectors = sample_chunks_with_vectors
+        chunks, vectors, _ = sample_chunks_with_vectors
         store.upsert(chunks, vectors)
 
         results = store.search(
@@ -102,3 +115,62 @@ class TestQdrantStore:
         )
         assert len(results) == 1
         assert results[0].fiscal_year == 2025
+
+
+class TestQdrantStoreHybrid:
+    def test_upsert_with_sparse(
+        self,
+        sparse_store: QdrantStore,
+        sample_chunks_with_vectors: tuple[list[Chunk], list[list[float]], list[SparseVector]],
+    ) -> None:
+        chunks, vectors, sparse_vectors = sample_chunks_with_vectors
+        sparse_store.upsert(chunks, vectors, sparse_vectors=sparse_vectors)
+        assert sparse_store.count() == 2
+
+    def test_hybrid_search(
+        self,
+        sparse_store: QdrantStore,
+        sample_chunks_with_vectors: tuple[list[Chunk], list[list[float]], list[SparseVector]],
+    ) -> None:
+        chunks, vectors, sparse_vectors = sample_chunks_with_vectors
+        sparse_store.upsert(chunks, vectors, sparse_vectors=sparse_vectors)
+
+        results = sparse_store.search(
+            [1.0, 0.0, 0.0, 0.0],
+            top_k=2,
+            sparse_vector=SparseVector(indices=[0, 1], values=[0.5, 0.3]),
+            prefetch_limit=10,
+        )
+        assert len(results) == 2
+
+    def test_hybrid_search_with_filter(
+        self,
+        sparse_store: QdrantStore,
+        sample_chunks_with_vectors: tuple[list[Chunk], list[list[float]], list[SparseVector]],
+    ) -> None:
+        chunks, vectors, sparse_vectors = sample_chunks_with_vectors
+        sparse_store.upsert(chunks, vectors, sparse_vectors=sparse_vectors)
+
+        results = sparse_store.search(
+            [0.5, 0.5, 0.0, 0.0],
+            top_k=2,
+            qdrant_filter=Filter(must=[
+                FieldCondition(key="fiscal_year", match=MatchValue(value=2025)),
+            ]),
+            sparse_vector=SparseVector(indices=[1, 2], values=[0.7, 0.2]),
+            prefetch_limit=10,
+        )
+        assert len(results) == 1
+        assert results[0].fiscal_year == 2025
+
+    def test_dense_only_fallback_on_sparse_store(
+        self,
+        sparse_store: QdrantStore,
+        sample_chunks_with_vectors: tuple[list[Chunk], list[list[float]], list[SparseVector]],
+    ) -> None:
+        chunks, vectors, sparse_vectors = sample_chunks_with_vectors
+        sparse_store.upsert(chunks, vectors, sparse_vectors=sparse_vectors)
+
+        results = sparse_store.search([1.0, 0.0, 0.0, 0.0], top_k=1)
+        assert len(results) == 1
+        assert results[0].text == "Apple makes iPhones"

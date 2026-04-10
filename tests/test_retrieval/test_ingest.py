@@ -8,6 +8,7 @@ from qdrant_client import QdrantClient
 
 from research_assistant.corpus.edgar.metadata import EdgarMetadata
 from research_assistant.corpus.models import Chunk
+from research_assistant.retrieval.embeddings import SparseVector
 from research_assistant.retrieval.ingest import ingest_chunks
 from research_assistant.retrieval.vector_store import QdrantStore
 
@@ -21,10 +22,23 @@ class FakeEmbedder:
         return np.random.default_rng(42).random((len(texts), 4)).astype(np.float32)
 
 
+class FakeSparseEmbedder:
+    def embed(self, texts: list[str]) -> list[SparseVector]:
+        return [SparseVector(indices=[0, 1], values=[0.5, 0.3]) for _ in texts]
+
+
 @pytest.fixture
 def store() -> QdrantStore:
     client = QdrantClient(":memory:")
     s = QdrantStore(client, "test", vector_dim=4)
+    s.ensure_collection()
+    return s
+
+
+@pytest.fixture
+def sparse_store() -> QdrantStore:
+    client = QdrantClient(":memory:")
+    s = QdrantStore(client, "test", vector_dim=4, enable_sparse=True)
     s.ensure_collection()
     return s
 
@@ -63,3 +77,12 @@ class TestIngestChunks:
         result = ingest_chunks([], FakeEmbedder(), store)
         assert result == 0
         assert store.count() == 0
+
+    def test_ingests_with_sparse_embedder(
+        self, chunks: list[Chunk], sparse_store: QdrantStore,
+    ) -> None:
+        result = ingest_chunks(
+            chunks, FakeEmbedder(), sparse_store, sparse_embedder=FakeSparseEmbedder(),
+        )
+        assert result == 3
+        assert sparse_store.count() == 3

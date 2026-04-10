@@ -7,7 +7,7 @@ from research_assistant.config import Settings, configure_logfire
 from research_assistant.corpus.edgar.cache import create_cache
 from research_assistant.corpus.edgar.chunker import EdgarChunker
 from research_assistant.corpus.edgar.parser import EdgarParser
-from research_assistant.retrieval.embeddings import FastEmbedEmbedder
+from research_assistant.retrieval.embeddings import FastEmbedEmbedder, FastEmbedSparseEmbedder
 from research_assistant.retrieval.ingest import ingest_chunks
 from research_assistant.retrieval.vector_store import QdrantStore, create_qdrant_client
 
@@ -38,8 +38,18 @@ def main() -> None:
     edgar_parser = EdgarParser(identity=args.identity, cache=cache)
     chunker = EdgarChunker(max_tokens=settings.chunk_max_tokens, tokenizer=settings.embedding_model)
     embedder = FastEmbedEmbedder(model_name=settings.embedding_model)
+
+    sparse_embedder: FastEmbedSparseEmbedder | None = None
+    if settings.sparse_model:
+        sparse_embedder = FastEmbedSparseEmbedder(model_name=settings.sparse_model)
+
     client = create_qdrant_client(settings)
-    store = QdrantStore(client, settings.collection_name, embedder.dim)
+    store = QdrantStore(
+        client,
+        settings.collection_name,
+        embedder.dim,
+        enable_sparse=bool(settings.sparse_model),
+    )
     if args.fresh:
         logger.info("Deleting collection '%s' for fresh ingestion", settings.collection_name)
         client.delete_collection(settings.collection_name)
@@ -57,7 +67,7 @@ def main() -> None:
 
             chunks = chunker.chunk(doc)
             logger.info("  %d chunks from %s FY%d", len(chunks), ticker, year)
-            total_chunks += ingest_chunks(chunks, embedder, store)
+            total_chunks += ingest_chunks(chunks, embedder, store, sparse_embedder=sparse_embedder)
 
     logger.info(
         "Ingested %d total chunks into collection '%s'", total_chunks, settings.collection_name

@@ -30,6 +30,9 @@ class Settings(BaseSettings):
 
     chunk_max_tokens: int = 512
 
+    sparse_model: str | None = "Qdrant/bm25"
+    prefetch_limit: int = 50
+
     top_k: int = 3
     rerank_model: str | None = "Xenova/ms-marco-MiniLM-L-6-v2"
     rerank_top_k: int = 20

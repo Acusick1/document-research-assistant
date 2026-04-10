@@ -7,7 +7,7 @@ from pydantic_ai.settings import ModelSettings
 from research_assistant.agents.simple import create_agent
 from research_assistant.config import Settings, get_settings
 from research_assistant.eval.models import EvalInput, EvalOutput
-from research_assistant.retrieval.embeddings import FastEmbedEmbedder
+from research_assistant.retrieval.embeddings import FastEmbedEmbedder, FastEmbedSparseEmbedder
 from research_assistant.retrieval.query_filter import QueryFilterExtractor
 from research_assistant.retrieval.reranker import CrossEncoderReranker
 from research_assistant.retrieval.vector_store import (
@@ -38,16 +38,25 @@ class RagPipeline:
         settings = settings or get_settings()
         self._embedder = FastEmbedEmbedder(model_name=settings.embedding_model)
         client = create_qdrant_client(settings)
-        self._store = QdrantStore(client, settings.collection_name, self._embedder.dim)
+        self._store = QdrantStore(
+            client,
+            settings.collection_name,
+            self._embedder.dim,
+            enable_sparse=bool(settings.sparse_model),
+        )
         self._agent = create_agent(model=settings.llm_model)
         self._filter_extractor = QueryFilterExtractor(
             store=self._store, model=settings.filter_model,
         )
+        self._sparse_embedder: FastEmbedSparseEmbedder | None = None
+        if settings.sparse_model:
+            self._sparse_embedder = FastEmbedSparseEmbedder(model_name=settings.sparse_model)
         self._reranker: CrossEncoderReranker | None = None
         if settings.rerank_model:
             self._reranker = CrossEncoderReranker(model_name=settings.rerank_model)
         self._top_k = settings.top_k
         self._rerank_top_k = settings.rerank_top_k
+        self._prefetch_limit = settings.prefetch_limit
         self._max_tokens = settings.max_tokens
 
     async def __call__(self, eval_input: EvalInput) -> EvalOutput:
@@ -56,9 +65,18 @@ class RagPipeline:
             return EvalOutput(answer=filter_result.reject_reason, sources=[])
 
         query_vector = self._embedder.embed([eval_input.query])[0].tolist()
+
+        sparse_query = None
+        if self._sparse_embedder:
+            sparse_query = self._sparse_embedder.embed([eval_input.query])[0]
+
         search_top_k = self._rerank_top_k if self._reranker else self._top_k
         results = self._store.search(
-            query_vector, top_k=search_top_k, qdrant_filter=filter_result.qdrant_filter,
+            query_vector,
+            top_k=search_top_k,
+            qdrant_filter=filter_result.qdrant_filter,
+            sparse_vector=sparse_query,
+            prefetch_limit=self._prefetch_limit,
         )
         if self._reranker:
             results = self._reranker.rerank(eval_input.query, results, top_k=self._top_k)
