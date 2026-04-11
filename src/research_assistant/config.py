@@ -36,7 +36,7 @@ class Settings(BaseSettings):
     top_k: int = 3
     rerank_model: str | None = "Xenova/ms-marco-MiniLM-L-6-v2"
     rerank_top_k: int = 20
-    max_tokens: int = 512
+    max_tokens: int = 1024
 
     cache_dir: Path = Path(".cache/edgar")
 

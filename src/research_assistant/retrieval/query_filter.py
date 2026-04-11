@@ -168,7 +168,7 @@ class QueryFilterExtractor:
     def _resolve(self, entities: ExtractedEntities) -> QueryFilters:
         tickers: list[str] = []
         for company in entities.companies:
-            ticker = self._match_ticker(company)
+            ticker = self.match_ticker(company)
             if ticker and ticker not in tickers:
                 tickers.append(ticker)
 
@@ -189,7 +189,7 @@ class QueryFilterExtractor:
         hits = self._store.get_field_values("fiscal_year")
         return {int(h.value) for h in hits}
 
-    def _match_ticker(self, company: str) -> str | None:
+    def match_ticker(self, company: str) -> str | None:
         key = company.strip().lower()
 
         if key in self._name_to_ticker:
