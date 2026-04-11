@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import AsyncIterator
+from dataclasses import dataclass
 
 from pydantic_ai.settings import ModelSettings
 
@@ -17,6 +19,16 @@ from research_assistant.retrieval.vector_store import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class StatusEvent:
+    message: str
+
+
+@dataclass
+class AnswerEvent:
+    output: EvalOutput
 
 
 def _format_context(results: list[SearchResult]) -> str:
@@ -59,16 +71,19 @@ class RagPipeline:
         self._prefetch_limit = settings.prefetch_limit
         self._max_tokens = settings.max_tokens
 
-    async def __call__(self, eval_input: EvalInput) -> EvalOutput:
-        filter_result = await self._filter_extractor.extract(eval_input.query)
+    async def stream(self, query: str) -> AsyncIterator[StatusEvent | AnswerEvent]:
+        yield StatusEvent("Extracting filters...")
+        filter_result = await self._filter_extractor.extract(query)
         if filter_result.reject_reason:
-            return EvalOutput(answer=filter_result.reject_reason, sources=[])
+            yield AnswerEvent(EvalOutput(answer=filter_result.reject_reason, sources=[]))
+            return
 
-        query_vector = self._embedder.embed([eval_input.query])[0].tolist()
+        yield StatusEvent("Retrieving documents...")
+        query_vector = self._embedder.embed([query])[0].tolist()
 
         sparse_query = None
         if self._sparse_embedder:
-            sparse_query = self._sparse_embedder.embed([eval_input.query])[0]
+            sparse_query = self._sparse_embedder.embed([query])[0]
 
         search_top_k = self._rerank_top_k if self._reranker else self._top_k
         results = self._store.search(
@@ -79,21 +94,29 @@ class RagPipeline:
             prefetch_limit=self._prefetch_limit,
         )
         if self._reranker:
-            results = self._reranker.rerank(eval_input.query, results, top_k=self._top_k)
+            yield StatusEvent("Reranking...")
+            results = self._reranker.rerank(query, results, top_k=self._top_k)
 
         context = _format_context(results)
         sources = _sources_from_results(results)
 
-        prompt = f"Question: {eval_input.query}\n\nRetrieved Context:\n{context}"
+        prompt = f"Question: {query}\n\nRetrieved Context:\n{context}"
         logger.debug("RAG prompt (%d retrieved chunks):\n%s", len(results), prompt[:500])
 
+        yield StatusEvent(f"Synthesizing from {len(results)} chunks...")
         response = await self._agent.run(
             prompt, model_settings=ModelSettings(max_tokens=self._max_tokens),
         )
         output = response.output
 
-        return EvalOutput(
+        yield AnswerEvent(EvalOutput(
             answer=output.answer,
             numeric_answer=output.numeric_answer,
             sources=sources,
-        )
+        ))
+
+    async def __call__(self, eval_input: EvalInput) -> EvalOutput:
+        async for event in self.stream(eval_input.query):
+            if isinstance(event, AnswerEvent):
+                return event.output
+        raise RuntimeError("Pipeline stream ended without producing an answer")
